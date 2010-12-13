@@ -8,6 +8,7 @@ import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.FrameView;
+import org.jdesktop.application.Task;
 import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -91,6 +92,28 @@ public class AuthenticatedDHView extends FrameView {
         AuthenticatedDHApp.getApplication().show(aboutBox);
     }
 
+    @Action
+     public Task connect() {
+        return new ConnectTask(getApplication());
+    }
+
+    private class ConnectTask extends org.jdesktop.application.Task<Object, Void> {
+        ConnectTask(org.jdesktop.application.Application app) {
+            // Runs on the EDT.  Copy GUI state that
+            // doInBackground() depends on from parameters
+            // to ConnectTask fields, here.
+            super(app);
+        }
+        @Override protected Object doInBackground() {
+            CClientConnector.getInstance().connect("localhost");
+            return null;  // return your result
+        }
+        @Override protected void succeeded(Object result) {
+            // Runs on the EDT.  Update the GUI based on
+            // the result computed by doInBackground().
+        }
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -103,7 +126,8 @@ public class AuthenticatedDHView extends FrameView {
         mainPanel = new javax.swing.JPanel();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
-        javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem connect = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem exitMenuItem1 = new javax.swing.JMenuItem();
         javax.swing.JMenu helpMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
         statusPanel = new javax.swing.JPanel();
@@ -122,7 +146,7 @@ public class AuthenticatedDHView extends FrameView {
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 252, Short.MAX_VALUE)
+            .addGap(0, 254, Short.MAX_VALUE)
         );
 
         menuBar.setName("menuBar"); // NOI18N
@@ -132,9 +156,16 @@ public class AuthenticatedDHView extends FrameView {
         fileMenu.setName("fileMenu"); // NOI18N
 
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(authenticateddh.AuthenticatedDHApp.class).getContext().getActionMap(AuthenticatedDHView.class, this);
-        exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
-        exitMenuItem.setName("exitMenuItem"); // NOI18N
-        fileMenu.add(exitMenuItem);
+        connect.setAction(actionMap.get("connect")); // NOI18N
+        connect.setText(resourceMap.getString("connect.text")); // NOI18N
+        connect.setToolTipText(resourceMap.getString("connect.toolTipText")); // NOI18N
+        connect.setActionCommand(resourceMap.getString("connect.actionCommand")); // NOI18N
+        connect.setName("connect"); // NOI18N
+        fileMenu.add(connect);
+
+        exitMenuItem1.setAction(actionMap.get("quit")); // NOI18N
+        exitMenuItem1.setName("exitMenuItem1"); // NOI18N
+        fileMenu.add(exitMenuItem1);
 
         menuBar.add(fileMenu);
 
@@ -166,7 +197,7 @@ public class AuthenticatedDHView extends FrameView {
             .addGroup(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(statusMessageLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 226, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 230, Short.MAX_VALUE)
                 .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(statusAnimationLabel)
