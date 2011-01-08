@@ -157,6 +157,7 @@ public class AuthenticatedDHView extends FrameView {
 
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(authenticateddh.AuthenticatedDHApp.class).getContext().getActionMap(AuthenticatedDHView.class, this);
         connect.setAction(actionMap.get("connect")); // NOI18N
+        connect.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_MASK));
         connect.setText(resourceMap.getString("connect.text")); // NOI18N
         connect.setToolTipText(resourceMap.getString("connect.toolTipText")); // NOI18N
         connect.setActionCommand(resourceMap.getString("connect.actionCommand")); // NOI18N
