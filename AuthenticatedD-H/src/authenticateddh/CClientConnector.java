@@ -5,12 +5,9 @@
 
 package authenticateddh;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -27,12 +24,7 @@ public class CClientConnector {
     private static CClientConnector instance;
 
     // Gniazdko klienta
-    private Socket clientSocket;
-    
-    // Czytanie i pisanie, potrzebne do operacji na gniezdzie
-    private PrintWriter printWriter;
-    private BufferedReader bufferedReader;
-
+    Socket clientSocket;
 
     //Singleton
     private CClientConnector()
@@ -52,12 +44,12 @@ public class CClientConnector {
     throw new CloneNotSupportedException();
     }
     //polaczenie
-    synchronized public boolean connect(String ip)
+    synchronized public boolean connect(String ip, String reason)
     {
         try {
             System.out.println("Connection started");
-            standardConnect(ip, CClientConstraints.TCP_PORT);
-            standardCommunication();
+            standardConnect(CClientConstraints.SERVER_IP, CClientConstraints.TCP_PORT);
+            standardCommunication(reason);
             disconnect();
         } catch (UnknownHostException ex) {
             Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
@@ -84,31 +76,38 @@ public class CClientConnector {
     }
 
     //komunikacja
-    synchronized private boolean standardCommunication() throws IOException
+    synchronized private boolean standardCommunication(String command) throws IOException
     {
-        String inputLine, outputLine;
+        ObjectInputStream oInputStream = null;
+        ObjectOutputStream oOutputStream = null;
+
+        CPacket packetOut = new CPacket();
+        CPacket packetIn = new CPacket();
+
+        boolean result = false;
+
         try {
-                InputStream is = clientSocket.getInputStream();
-                OutputStream os = clientSocket.getOutputStream();
+                //Wysylanie
+                oOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
 
-                printWriter = new PrintWriter(os, true);
-                bufferedReader = new BufferedReader(
-				    new InputStreamReader(
-				    is));
+                packetOut = CCommunicationProtocol.getInstance().processOutput(command);
 
-                
-                outputLine = "hello, to ja klient";
-                System.out.println("wyslalem");
-                System.out.println("->" + outputLine);
-                printWriter.println(outputLine);
+                oOutputStream.writeObject(packetOut);
+                oOutputStream.flush();
 
-                inputLine = bufferedReader.readLine();
-                System.out.println("odczytalem");
-                System.out.println("<-" + inputLine);
-                
-                printWriter.close();
-                bufferedReader.close();
+                //Odbieranie
+                oInputStream = new ObjectInputStream(clientSocket.getInputStream());
 
+                packetIn = (CPacket) oInputStream.readObject();
+
+                result = CCommunicationProtocol.getInstance().processInput(packetIn);
+
+                //Zamykanie
+                oInputStream.close();
+                oOutputStream.close();
+
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SocketException ex) {
             System.err.println(ex.getMessage());
         } catch (NullPointerException ex) {
@@ -116,6 +115,6 @@ public class CClientConnector {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
+        return result;
     }
 }
