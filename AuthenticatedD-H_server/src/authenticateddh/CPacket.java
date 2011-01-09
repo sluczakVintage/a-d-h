@@ -15,8 +15,7 @@ public class CPacket implements Serializable {
 
     private String flag;
     private CMessage message;
-    private CHash hash;
-
+    
     public CPacket() {
 
     }
@@ -29,9 +28,6 @@ public class CPacket implements Serializable {
         message = message_;
     }
 
-    void setCHash(CHash hash_) {
-        hash = hash_;
-    }
 
     String getFlag() {
         return this.flag;
@@ -41,8 +37,5 @@ public class CPacket implements Serializable {
         return this.message;
     }
 
-    CHash getCHash() {
-        return this.hash;
-    }
 
 }
