@@ -40,5 +40,8 @@ public class AuthenticatedDHApp extends SingleFrameApplication {
      */
     public static void main(String[] args) {
         launch(AuthenticatedDHApp.class, args);
+        CClientConstraints.getInstance().setPasswordHash("haslo");
+        //CInterClientConnector.getInstance().setRoleServer(false);
+        //CInterClientConnector.getInstance().prepareConnection("localhost", 42222);
     }
 }

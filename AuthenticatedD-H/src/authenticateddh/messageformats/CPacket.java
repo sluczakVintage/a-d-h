@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package authenticateddh;
+package authenticateddh.messageformats;
 
 import java.io.Serializable;
 
@@ -20,20 +20,20 @@ public class CPacket implements Serializable {
 
     }
 
-    void setFlag(String flag_) {
+    public void setFlag(String flag_) {
         flag = flag_;
     }
 
-    void setCMessage(CMessage message_) {
+    public void setCMessage(CMessage message_) {
         message = message_;
     }
 
 
-    String getFlag() {
+    public String getFlag() {
         return this.flag;
     }
 
-    CMessage getCMessage() {
+    public CMessage getCMessage() {
         return this.message;
     }
 

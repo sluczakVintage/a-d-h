@@ -105,7 +105,8 @@ public class AuthenticatedDHView extends FrameView {
             super(app);
         }
         @Override protected Object doInBackground() {
-            CClientConnector.getInstance().connect("localhost", "TEST");
+            CCurrentCommand.getInstance().setCurrentCommand("Register");
+            CClientConnector.getInstance().connect("localhost");
             return null;  // return your result
         }
         @Override protected void succeeded(Object result) {

@@ -5,12 +5,15 @@
 
 package authenticateddh;
 
+import authenticateddh.messageformats.CPacket;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.channels.SocketChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,11 +23,12 @@ import java.util.logging.Logger;
  *
  * @author Sebastian
  */
-public class CClientConnector {
+public class CClientConnector extends Thread {
     private static CClientConnector instance;
 
     // Gniazdko klienta
-    Socket clientSocket;
+    private Socket clientSocket;
+    private SocketChannel sChannel;
 
     //Singleton
     private CClientConnector()
@@ -44,12 +48,18 @@ public class CClientConnector {
     throw new CloneNotSupportedException();
     }
     //polaczenie
-    synchronized public boolean connect(String ip, String reason)
+    synchronized public boolean connect(String ip)
     {
+        
         try {
+            sChannel = SocketChannel.open();
+            sChannel.configureBlocking(true);
+
             System.out.println("Connection started");
-            standardConnect(CClientConstraints.SERVER_IP, CClientConstraints.TCP_PORT);
-            standardCommunication(reason);
+            if(standardConnect(CClientConstraints.SERVER_IP, CClientConstraints.TCP_PORT)) {
+                System.out.println("Standard connection completed");
+            }
+            standardCommunication();
             disconnect();
         } catch (UnknownHostException ex) {
             Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
@@ -63,49 +73,62 @@ public class CClientConnector {
         return true;
     }
     //podlaczenie
-    synchronized private void standardConnect(String hostname, int port) throws UnknownHostException, IOException
+    synchronized private boolean standardConnect(String hostname, int port) throws UnknownHostException, IOException
     {
-        clientSocket = new Socket( hostname, port );
-        System.out.println("Standard connection completed");
+        return sChannel.connect(new InetSocketAddress(hostname, port));
+        //clientSocket = new Socket( hostname, port );
+        
     }
 
     synchronized private void disconnect() throws UnknownHostException, IOException
     {
-        clientSocket.close();
+        sChannel.close();
         System.out.println("Disconnected");
     }
 
     //komunikacja
-    synchronized private boolean standardCommunication(String command) throws IOException
+    synchronized private boolean standardCommunication() throws IOException
     {
+        clientSocket = sChannel.socket();
+        
         ObjectInputStream oInputStream = null;
-        ObjectOutputStream oOutputStream = null;
+
+        //Wysylanie
+        ObjectOutputStream oOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
 
         CPacket packetOut = new CPacket();
         CPacket packetIn = new CPacket();
 
+        boolean communication = true;
+
         boolean result = false;
 
         try {
-                //Wysylanie
-                oOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            while(communication) {
+                if(!CCurrentCommand.getInstance().getCurrentCommand().equals("none")) {
+                    packetOut = CCommunicationProtocol.getInstance().processOutput(null);
 
-                packetOut = CCommunicationProtocol.getInstance().processOutput(command);
+                    oOutputStream.writeObject(packetOut);
+                    oOutputStream.flush();
 
-                oOutputStream.writeObject(packetOut);
-                oOutputStream.flush();
+                    //Odbieranie
+                    if(oInputStream == null)
+                        oInputStream = new ObjectInputStream(clientSocket.getInputStream());
 
-                //Odbieranie
-                oInputStream = new ObjectInputStream(clientSocket.getInputStream());
+                    packetIn = (CPacket) oInputStream.readObject();
 
-                packetIn = (CPacket) oInputStream.readObject();
+                    result = CCommunicationProtocol.getInstance().processInput(packetIn);
 
-                result = CCommunicationProtocol.getInstance().processInput(packetIn);
+                    oOutputStream.reset();
+                }
+                sleep(1000);
+            }
+            //Zamykanie
+            oInputStream.close();
+            oOutputStream.close();
 
-                //Zamykanie
-                oInputStream.close();
-                oOutputStream.close();
-
+        } catch (InterruptedException ex) {
+            Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SocketException ex) {

@@ -5,21 +5,74 @@
 
 package authenticateddh;
 
+import java.math.BigInteger;
+
 /**
  *
  * @author Sebastian
  */
 public class CClientConstraints {
 
-    public static final int TCP_SSL_PORT = 25801;
+    private static CClientConstraints instance;
+    
     public static final int TCP_PORT = 25802;
-    public static final String KEY_PATH_CLIENT = "./keys/clientstore";
-    public static final String KEY_PATH_TRUSTED = "./keys/cacerts";
+    public static final String SERVER_IP = "localhost";
 
-    public static final String APP_PATH = "./config/AppLists/";
-    public static final String SERVER_LIST_PATH = "./config/IpList.dat";
+    private CClientConstraints()
+    {
+        System.out.println("CClientConstraints");
+    }
 
-    public static final String SERVER_IP = "192.168.1.101";
+    public static synchronized CClientConstraints getInstance() {
+	if (instance == null) {
+		instance = new CClientConstraints();
+	}
+	return instance;
+    }
+    
+    private int ID = 0;
+    private String nickname = "nick";
+    private String passwordHash = "haslo";
+
+    private BigInteger g;
+    private BigInteger y;
+    private BigInteger q;
+    private BigInteger r_ID;
+    private int s_ID;
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setPasswordHash(String password) {
+        this.passwordHash = CMessageDigestFile.getInstance().getSHA256Checksum(password);
+        
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setUserData(int ID, BigInteger g, BigInteger y, BigInteger q, BigInteger r_ID, int s_ID ) {
+        this.ID = ID;
+        this.g = g;
+        this.y = y;
+        this.q = q;
+        this.r_ID = r_ID;
+        this.s_ID = s_ID;
+    }
 
 }
 
