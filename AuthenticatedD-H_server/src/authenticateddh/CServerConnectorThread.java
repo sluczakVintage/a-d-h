@@ -6,11 +6,14 @@
 package authenticateddh;
 
 
+import authenticateddh.messageformats.CCommand;
+import authenticateddh.messageformats.CPacket;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,9 +30,9 @@ public class CServerConnectorThread extends Thread{
     private CCommunicationProtocolServer cCommunicationProtocolServer = new CCommunicationProtocolServer();
 
 
-    public CServerConnectorThread(Socket socket) {
+    public CServerConnectorThread(SocketChannel serverSocketChannel) {
 	super("CServerConnectionThread");
-	this.socket = socket;
+	this.socket = serverSocketChannel.socket();
         this.sourceAddress = socket.getInetAddress();
         System.out.println("Accepted connection from " + sourceAddress);
         try {
@@ -50,27 +53,34 @@ public class CServerConnectorThread extends Thread{
 
         CPacket packetOut = new CPacket();
         CPacket packetIn = new CPacket();
-        String command;
+        CCommand command;
+        boolean communication = true;
 
         try {
 
+            while(communication) {
             //Odbieranie
-            packetOut = (CPacket) oInputStream.readObject();
+            packetIn = (CPacket) oInputStream.readObject();
 
-            command = cCommunicationProtocolServer.processInput(packetOut);
+            command = cCommunicationProtocolServer.processInput(packetIn, socket);
 
             //Wysylanie
-            packetIn = cCommunicationProtocolServer.processOutput(command);
+            packetOut = cCommunicationProtocolServer.processOutput(command);
 
-            oOutputStream.writeObject(packetIn);
+            oOutputStream.writeObject(packetOut);
             oOutputStream.flush();
-
+            oOutputStream.reset();
+            sleep(1000);
+            }
             //Zamykanie
             oInputStream.close();
             oOutputStream.close();
+
             socket.close();
 
             System.out.println("Killing Thread");
+        } catch (InterruptedException ex) {
+            Logger.getLogger(CServerConnectorThread.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(CServerConnectorThread.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

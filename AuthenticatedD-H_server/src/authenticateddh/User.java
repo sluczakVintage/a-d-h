@@ -5,6 +5,7 @@
 package authenticateddh;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -18,21 +19,33 @@ public class User {
     private static final BigInteger TWO = new BigInteger(String.valueOf(2));
     private static final BigInteger ZERO = new BigInteger(String.valueOf(0));
     private static final BigInteger ONE = new BigInteger(String.valueOf(1));
-    int ID_;
-    BigInteger rID_;
-    int sID_;
-    BigInteger generator_;
-    BigInteger y_;
+    private int ID_;
+    private BigInteger rID_;
+    private int sID_;
+    private BigInteger generator_;
+    private BigInteger y_;
+    private String nickname;
+    private String passwordHash;
+    private InetAddress inetAddress;
+    private boolean available;
 
     //konstruktor domyslny
     User() {
     }
 
-    User(int id, BigInteger g, BigInteger y){
+    User(int id, String nickname, String passwordHash, BigInteger g, BigInteger y, InetAddress inetAddress, boolean available){
         ID_=id;
         y_=y;
         generator_=g;
+        this.inetAddress = inetAddress;
+        this.passwordHash = passwordHash;
+        this.nickname = nickname;
+        this.available = available;
+
+        //@todo s_ID r_ID sa puste!!! trzeba je przypisac....
+
         System.out.println("Utworzono nowego usera ");
+        System.out.println("ID " + id + " nickname " + nickname + " passwordHash " + passwordHash + " IP " + inetAddress.getHostAddress());
     }
 
     boolean checkKey(KeyPair kp) {
@@ -99,5 +112,49 @@ public class User {
         SecureRandom random = new SecureRandom();
         BigInteger temp = new BigInteger(length, random);
         return temp.intValue();
+    }
+
+    public InetAddress getInetAddress() {
+        return inetAddress;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public boolean getAvailability() {
+        return available;
+    }
+
+    public void setAvailability(boolean available) {
+        this.available = available;
+    }
+
+    void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    void setInetAddress(InetAddress address) {
+        this.inetAddress = address;
+    }
+
+    int getID() {
+        return ID_;
+    }
+
+    BigInteger getG() {
+        return generator_;
+    }
+
+    BigInteger getY() {
+        return y_;
+    }
+
+    int getS_ID() {
+        return sID_;
+    }
+
+    BigInteger getR_ID() {
+        return rID_;
     }
 }

@@ -6,7 +6,8 @@
 package authenticateddh;
 
 import java.io.IOException;
-import java.net.ServerSocket;
+import java.net.InetSocketAddress;
+import java.nio.channels.ServerSocketChannel;
 
 /**
  *
@@ -16,13 +17,14 @@ public class CServerConnector implements Runnable{
 
 
     static private CServerConnector instance;
-    private ServerSocket serverSocket;
+
+    private ServerSocketChannel serverChannel;
+    
     private boolean listening;
 
     private CServerConnector() throws IOException
     {
-        serverSocket = null;
-        listening = true;
+       listening = true;
         System.out.println("CServerConnector");
     }
 
@@ -42,17 +44,19 @@ public class CServerConnector implements Runnable{
 
         try {
 
-        serverSocket = new ServerSocket( ServerConstraints.TCP_PORT );
+        serverChannel = ServerSocketChannel.open();
+        serverChannel.configureBlocking(true);
 
+        serverChannel.socket().bind(new InetSocketAddress(ServerConstraints.TCP_PORT));
+
+        
         while (listening)
-            new CServerConnectorThread(serverSocket.accept()).start();
+            new CServerConnectorThread(serverChannel.accept()).start();
 
-        serverSocket.close();
-
-            ///@todo
-        } catch ( IOException ex) {
-            System.err.println("IO Exception " + ex.getMessage());
-            ///@todo
+        serverChannel.close();
         }
+         catch ( IOException ex) {
+            System.err.println("IO Exception " + ex.getMessage());
+       }
     }
 }

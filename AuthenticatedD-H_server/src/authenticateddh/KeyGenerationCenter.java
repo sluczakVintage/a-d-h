@@ -8,15 +8,22 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author malina
  */
 public class KeyGenerationCenter {
+
+    //SL: Singleton
+    private static KeyGenerationCenter instance;
+
+    public static synchronized KeyGenerationCenter getInstance() {
+	if (instance == null) {
+		instance = new KeyGenerationCenter();
+	}
+	return instance;
+    }
 
     private int groupLength_;
     private BigInteger primeOrder_;
@@ -34,7 +41,7 @@ public class KeyGenerationCenter {
         // na razie nie ma tu nic sensownego
     }
 
-    private boolean inititializeKGC() {
+    private synchronized boolean inititializeKGC() {
 
         GeneratorFactory fact = new GeneratorFactory(96);
         primeOrder_ = fact.getP();
@@ -50,7 +57,7 @@ public class KeyGenerationCenter {
         return true;
     }
 
-    private KeyPair generateKeys(int id){
+    private synchronized KeyPair generateKeys(int id){
         int k=getRandomNumber(8);
         BigInteger rID=generator_.pow(k);;
         int sID= k + H1(rID.add(BigInteger.valueOf(id)))*x_;
@@ -59,16 +66,16 @@ public class KeyGenerationCenter {
         return new KeyPair(sID, rID);
     }
 
-    public BigInteger getGenerator_() {
+    public synchronized BigInteger getGenerator_() {
         return generator_;
     }
 
-    public BigInteger getY_() {
+    public synchronized BigInteger getY_() {
         return y_;
     }
 
 
-    static private int H1(BigInteger a) {
+    static synchronized private int H1(BigInteger a) {
 
         BigInteger result= new BigInteger(String.valueOf(1));
         try {
@@ -97,7 +104,7 @@ public class KeyGenerationCenter {
 
     }
 
-        static private BigInteger H2(BigInteger a) {
+    static synchronized private BigInteger H2(BigInteger a) {
 
         BigInteger result = new BigInteger(String.valueOf(1));
         try {
@@ -126,11 +133,16 @@ public class KeyGenerationCenter {
 
     }
 
-        static private int getRandomNumber(int length){
+    static synchronized private int getRandomNumber(int length){
             SecureRandom random = new SecureRandom();
             BigInteger temp = new BigInteger(length, random);
             return temp.intValue();
-        }
+    }
+
+    //zwraca Q
+    synchronized public BigInteger getQ() {
+        return primeOrder_;
+    }
 
     public static void main(String[] args) {
         System.out.println("Testujemy dzialanie tego syfu");
@@ -143,8 +155,8 @@ public class KeyGenerationCenter {
         //H1(a);
         //H1(b);
         //System.out.println(H1(a) +" "+ H1(b));
-        User bob = new User(1, KGC.getGenerator_(), KGC.getY_());
-        User alice = new User(2, KGC.getGenerator_(), KGC.getY_());
+        User bob = new User(1, "Bob", "hash", KGC.getGenerator_(), KGC.getY_(), null, true);
+        User alice = new User(2, "Alice", "hash",KGC.getGenerator_(), KGC.getY_(), null, true);
         KeyPair bobKP = KGC.generateKeys(1);
         //
         if (bob.checkKey(bobKP)) System.out.println("dziala");

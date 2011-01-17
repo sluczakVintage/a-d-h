@@ -29,6 +29,8 @@ public class Main {
 
         cServerConnector = CServerConnector.getInstance();
         new Thread(cServerConnector).start();
+        
+        KeyGenerationCenter.getInstance();        
     }
 
     public static void main(String[] args) {

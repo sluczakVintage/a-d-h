@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package authenticateddh;
+package authenticateddh.messageformats;
 
 import java.io.Serializable;
 
