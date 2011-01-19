@@ -57,12 +57,12 @@ public class KeyGenerationCenter {
         return true;
     }
 
-    private synchronized KeyPair generateKeys(int id){
+    public synchronized KeyPair generateKeys(int id){
         int k=getRandomNumber(8);
         BigInteger rID=generator_.pow(k);;
         int sID= k + H1(rID.add(BigInteger.valueOf(id)))*x_;
         //H1(rID.add(BigInteger.valueOf(id))
-        System.out.println("wygenerowano klucze, sID to " + sID + " a rID to " + rID);
+        System.out.println("wygenerowano klucze, sID to " + sID + " a rID to " + rID.bitLength());
         return new KeyPair(sID, rID);
     }
 
@@ -144,9 +144,9 @@ public class KeyGenerationCenter {
         return primeOrder_;
     }
 
-    public static void main(String[] args) {
-        System.out.println("Testujemy dzialanie tego syfu");
-        KeyGenerationCenter KGC = new KeyGenerationCenter();
+   // public static void main(String[] args) {
+        //System.out.println("Testujemy dzialanie tego syfu");
+       // KeyGenerationCenter KGC = new KeyGenerationCenter();
         //double gener = 4;
        //double order = 7;
         //SecureRandom random = new SecureRandom();
@@ -155,13 +155,13 @@ public class KeyGenerationCenter {
         //H1(a);
         //H1(b);
         //System.out.println(H1(a) +" "+ H1(b));
-        User bob = new User(1, "Bob", "hash", KGC.getGenerator_(), KGC.getY_(), null, true);
-        User alice = new User(2, "Alice", "hash",KGC.getGenerator_(), KGC.getY_(), null, true);
-        KeyPair bobKP = KGC.generateKeys(1);
+        //User bob = new User(1, "Bob", "hash", KGC.getGenerator_(), KGC.getY_(), null, true);
+        //User alice = new User(2, "Alice", "hash",KGC.getGenerator_(), KGC.getY_(), null, true);
+        //KeyPair bobKP = KGC.generateKeys(1);
         //
-        if (bob.checkKey(bobKP)) System.out.println("dziala");
-        else System.out.println("nie dziala");
+        //if (bob.checkKey(bobKP)) System.out.println("dziala");
+        //else System.out.println("nie dziala");
         //if (isIntGenerator(gener, order)) System.out.println(gener +" jest generatorem dla order rownego " + order);
         //else System.out.println(gener +" nie jest generatorem dla order rownego " + order);
-    }
+    //}
 }

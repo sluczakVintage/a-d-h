@@ -152,25 +152,25 @@ public class GeneratorFactory {
         return isGen;
     }
 //Test driver
-    public static void main(String[] args) {
-        int bitLen = 96;
-        if (args.length > 0) {
-            try {
-                bitLen = Integer.parseInt(args[0]);
-            } catch (NumberFormatException ex) {
-                bitLen = 512;
-            }
-        }
-        GeneratorFactory fact = new GeneratorFactory(bitLen);
-        BigInteger p = fact.getP(), g = fact.getG();
-        System.out.println("p probable prime: "
-                + (p.isProbablePrime(1000) ? "yes" : "no"));
-        System.out.println(p.bitLength());
-        if (g.compareTo(p) < 0) {
-            System.out.println("g < p");
-        } else {
-            System.out.println("p divides g: " + (g.mod(p).equals(ZERO) ? "yes" : "no"));
-        }
-        System.out.println(p.modPow(TWO, ONE));
-    }
+//    public static void main(String[] args) {
+//        int bitLen = 96;
+//        if (args.length > 0) {
+//            try {
+//                bitLen = Integer.parseInt(args[0]);
+//            } catch (NumberFormatException ex) {
+//                bitLen = 512;
+//            }
+//        }
+//        GeneratorFactory fact = new GeneratorFactory(bitLen);
+//        BigInteger p = fact.getP(), g = fact.getG();
+//        System.out.println("p probable prime: "
+//                + (p.isProbablePrime(1000) ? "yes" : "no"));
+//        System.out.println(p.bitLength());
+//        if (g.compareTo(p) < 0) {
+//            System.out.println("g < p");
+//        } else {
+//            System.out.println("p divides g: " + (g.mod(p).equals(ZERO) ? "yes" : "no"));
+//        }
+//        System.out.println(p.modPow(TWO, ONE));
+//    }
 }

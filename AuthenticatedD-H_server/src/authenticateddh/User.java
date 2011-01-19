@@ -33,10 +33,13 @@ public class User {
     User() {
     }
 
-    User(int id, String nickname, String passwordHash, BigInteger g, BigInteger y, InetAddress inetAddress, boolean available){
+
+        User(int id, String nickname, String passwordHash, BigInteger g, BigInteger y, int sID, BigInteger rID, InetAddress inetAddress, boolean available){
         ID_=id;
         y_=y;
         generator_=g;
+        rID_=rID;
+        sID_=sID;
         this.inetAddress = inetAddress;
         this.passwordHash = passwordHash;
         this.nickname = nickname;
@@ -45,7 +48,8 @@ public class User {
         //@todo s_ID r_ID sa puste!!! trzeba je przypisac....
 
         System.out.println("Utworzono nowego usera ");
-        System.out.println("ID " + id + " nickname " + nickname + " passwordHash " + passwordHash + " IP " + inetAddress.getHostAddress());
+        //System.out.println("ID " + id + " nickname " + nickname + " passwordHash " + passwordHash + " IP " + inetAddress.getHostAddress());
+        System.out.println("ID " + id + " nickname " + nickname + " passwordHash " + passwordHash + " IP ");
     }
 
     boolean checkKey(KeyPair kp) {
@@ -58,6 +62,7 @@ public class User {
         System.out.println("3");
         BigInteger right = rID.multiply(y_.pow(H1(rID.add(BigInteger.valueOf(ID_)))));
         System.out.println("4");
+        System.out.println("z1 to " + left.bitLength() + ", a z2 to " + right.bitLength());
         if (left.equals(right)) return true;
         else return false;
     }

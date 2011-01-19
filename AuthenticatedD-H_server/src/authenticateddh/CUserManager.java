@@ -36,7 +36,8 @@ public class CUserManager {
 
     public int addUser(String nickname, String passwordHash, InetAddress address) {
         ID++;
-        cUserMap.put(ID, new User(ID, nickname, passwordHash, KeyGenerationCenter.getInstance().getGenerator_(), KeyGenerationCenter.getInstance().getY_(), address, true));
+        KeyPair userKeyPairs = KeyGenerationCenter.getInstance().generateKeys(ID);
+        cUserMap.put(ID, new User(ID, nickname, passwordHash, KeyGenerationCenter.getInstance().getGenerator_(), KeyGenerationCenter.getInstance().getY_(),userKeyPairs.getsID_(), userKeyPairs.getrID_(),  address, true));
         
         return ID;
     }
