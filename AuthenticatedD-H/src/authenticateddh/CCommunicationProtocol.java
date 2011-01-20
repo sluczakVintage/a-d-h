@@ -164,6 +164,8 @@ public class CCommunicationProtocol {
                 ((CMessageRegister)cMessage).getQ(),
                 ((CMessageRegister)cMessage).getR_ID(),
                 ((CMessageRegister)cMessage).getS_ID());
+        System.out.println("Udalo sie odebrać moje dane, ich długości w bitach to (oprócz S_ID): G " + CClientConstraints.getInstance().getG().bitLength() + " Y "  + CClientConstraints.getInstance().getY().bitLength() + " Q "  + CClientConstraints.getInstance().getQ().bitLength() + " S_ID "  + CClientConstraints.getInstance().getS_ID() + " R_ID "  + CClientConstraints.getInstance().getR_ID().bitLength());
+
     }
   
 }

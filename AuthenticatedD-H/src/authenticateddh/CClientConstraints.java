@@ -35,6 +35,26 @@ public class CClientConstraints {
     private String passwordHash = "haslo";
 
     private BigInteger g;
+
+    public BigInteger getG() {
+        return g;
+    }
+
+    public BigInteger getQ() {
+        return q;
+    }
+
+    public BigInteger getR_ID() {
+        return r_ID;
+    }
+
+    public int getS_ID() {
+        return s_ID;
+    }
+
+    public BigInteger getY() {
+        return y;
+    }
     private BigInteger y;
     private BigInteger q;
     private BigInteger r_ID;
