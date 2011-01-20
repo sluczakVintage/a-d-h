@@ -24,6 +24,7 @@ public class CCommunicationProtocolServer {
          CCommand command = new CCommand("Error!", 0);
 
          System.out.println("Processing input... Flag = " + packet.getFlag());
+         ServerDHApp.getInstance().addLog("Processing input... Flag = " + packet.getFlag());
 
          if(packet.getFlag().equals("Register")) {
              command.setCommand(packet.getFlag());
@@ -54,6 +55,7 @@ public class CCommunicationProtocolServer {
         CPacket packet = new CPacket();
 
         System.out.println("Processing output... Command = " + command.getCommand());
+        ServerDHApp.getInstance().addLog("Processing output... Command = " + command.getCommand());
 
          if(command.equals("Register")) {
              packet = prepareCMessageRegister(command);

@@ -54,6 +54,7 @@ public class KeyGenerationCenter {
         y_=generator_.pow(x_);
         //System.out.println("grupa to " + primeOrder_ + ",jej dlugosc to " + primeOrder_.bitLength() + ", natomiast generator to " + generator_ + ",a jej dlugosc to " + generator_.bitLength());
         System.out.println("KGC poprawnie zainicjowane");
+        ServerDHApp.getInstance().addLog("KGC poprawnie zainicjowane");
         return true;
     }
 

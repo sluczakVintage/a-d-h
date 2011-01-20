@@ -15,38 +15,40 @@ import java.io.IOException;
 public class Main {
 
  private CServerConnector cServerConnector;
+ private ServerDHApp serverApp;
     /**
      * @param args the command line arguments
      */
     public Main() {
         try {
-        initServer();
+        initGui();
         } catch (IOException ex) {
 
         }
     }
-    private void initServer() throws IOException {
+    private void initGui() throws IOException {
 
-        cServerConnector = CServerConnector.getInstance();
-        new Thread(cServerConnector).start();
-        
-        KeyGenerationCenter.getInstance();        
+        serverApp = ServerDHApp.getInstance();
+        new Thread(serverApp).start();
+          
     }
 
     public static void main(String[] args) {
 
         System.out.println("SERWER");
+
+
         new Main();
-
-        while(true)
-        {
-            try {
-            Thread.sleep(100);
-            } catch (InterruptedException ex) {
-
-            }
-
-        }
+//
+//        while(true)
+//        {
+//            try {
+//            Thread.sleep(100);
+//            } catch (InterruptedException ex) {
+//
+//            }
+//
+//        }
     }
 
 }
