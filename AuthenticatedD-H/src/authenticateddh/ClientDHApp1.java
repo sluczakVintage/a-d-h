@@ -11,6 +11,9 @@
 
 package authenticateddh;
 
+import java.math.BigInteger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author malina
@@ -39,27 +42,44 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        jButtonRozmowa = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
+        jMenuItemConnect = new javax.swing.JMenuItem();
+        jMenuItemVerify = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jLabel1.setText("Zalogowani użytkownicy:");
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane1.setViewportView(jTextArea1);
+
+        jButtonRozmowa.setText("Rozpocznij rozmowę");
+
         jMenu1.setText("File");
 
-        jMenuItem1.setText("Connect");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItemConnect.setText("Connect");
+        jMenuItemConnect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                jMenuItemConnectActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem1);
+        jMenu1.add(jMenuItemConnect);
+
+        jMenuItemVerify.setText("Verify Keys");
+        jMenuItemVerify.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemVerifyActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItemVerify);
 
         jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
 
@@ -67,21 +87,53 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
+                    .addComponent(jLabel1)
+                    .addComponent(jButtonRozmowa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 279, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jButtonRozmowa)
+                .addContainerGap(35, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        CCurrentCommand.getInstance().setCurrentCommand("Register");
-        CClientConnector.getInstance().connect("localhost");
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    private void jMenuItemConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemConnectActionPerformed
+       CCurrentCommand.getInstance().setCurrentCommand("Register");
+       CClientConnector.getInstance().start();
+       //if(checkKey()) System.out.println("dziala weryfikacja");
+       //else System.out.println("nie dziala weryfikacja");
+    }//GEN-LAST:event_jMenuItemConnectActionPerformed
 
+    private void jMenuItemVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemVerifyActionPerformed
+       if(checkKey()) JOptionPane.showMessageDialog(null, "Weryfikacja kluczy zakonczona sukcesem", "Gratulacje", JOptionPane.INFORMATION_MESSAGE);
+       else JOptionPane.showMessageDialog(null, "Weryfikacja kluczy nieudana", "Gratulacje", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jMenuItemVerifyActionPerformed
+
+
+    private boolean checkKey(){
+        while(CClientConstraints.getInstance().getID()== 0){}
+        int sID = CClientConstraints.getInstance().getS_ID();
+        BigInteger rID = CClientConstraints.getInstance().getR_ID();
+        BigInteger generator = CClientConstraints.getInstance().getG();
+        int ID = CClientConstraints.getInstance().getID();
+        BigInteger y = CClientConstraints.getInstance().getY();
+        BigInteger left = generator.pow(sID);
+        BigInteger right = rID.multiply(y.pow(CClientConstraints.H1(rID.add(BigInteger.valueOf(ID)))));
+        return true;
+    }
     /**
     * @param args the command line arguments
     */
@@ -89,13 +141,20 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
                 //new ClientDHApp().setVisible(true);
                 initComponents();
                 setVisible(true);
+                //CCurrentCommand.getInstance().setCurrentCommand("Register");
+                //CClientConnector.getInstance().connect("localhost");
+                //System.out.println("Podłączyłem sie");
             }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonRozmowa;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItemConnect;
+    private javax.swing.JMenuItem jMenuItemVerify;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -30,6 +30,7 @@ public class Main {
 
         clientApp = ClientDHApp1.getInstance();
         new Thread(clientApp).start();
+        //clientApp.run();
 
         CClientConstraints.getInstance().setPasswordHash("haslo");
 

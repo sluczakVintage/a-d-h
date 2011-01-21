@@ -48,7 +48,8 @@ public class CClientConnector extends Thread {
     throw new CloneNotSupportedException();
     }
     //polaczenie
-    synchronized public boolean connect(String ip)
+    public void run()
+    //synchronized public boolean connect(String ip)
     {
         
         try {
@@ -64,13 +65,14 @@ public class CClientConnector extends Thread {
         } catch (UnknownHostException ex) {
             Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
             ex.printStackTrace();
-            return false;
+            //return false;
         } catch (IOException ex) {
             Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
             ex.printStackTrace();
-            return false;
+            //return false;
         }
-        return true;
+        System.out.println("działa communication");
+        //return true;
     }
     //podlaczenie
     synchronized private boolean standardConnect(String hostname, int port) throws UnknownHostException, IOException
@@ -138,6 +140,7 @@ public class CClientConnector extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("działa communication");
         return result;
     }
 }
