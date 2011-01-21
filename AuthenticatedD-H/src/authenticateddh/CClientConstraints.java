@@ -8,6 +8,7 @@ package authenticateddh;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 /**
  *
@@ -147,5 +148,10 @@ public class CClientConstraints {
 
 
 
+    synchronized public int getRandomNumber(int length){
+            SecureRandom random = new SecureRandom();
+            BigInteger temp = new BigInteger(length, random);
+            return temp.intValue();
+    }
 }
 

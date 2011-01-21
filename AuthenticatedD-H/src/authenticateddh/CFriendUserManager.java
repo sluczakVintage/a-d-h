@@ -1,0 +1,77 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package authenticateddh;
+
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.util.TreeMap;
+
+/**
+ *
+ * @author malina
+ */
+public class CFriendUserManager {
+
+    TreeMap<Integer, CFriendUser> cFriendUserMap;
+
+    private static CFriendUserManager instance;
+
+    public static synchronized CFriendUserManager getInstance() {
+	if (instance == null) {
+		instance = new CFriendUserManager();
+	}
+	return instance;
+    }
+
+        private CFriendUserManager()
+    {
+        cFriendUserMap = new TreeMap();
+        System.out.println("CFriendUserManager");
+    }
+
+        public int addUser(int ID, String nickname, InetAddress inetAddress, boolean available) {
+        //KeyPair userKeyPairs = KeyGenerationCenter.getInstance().generateKeys(ID);
+        cFriendUserMap.put(ID, new CFriendUser(ID, nickname, inetAddress, available));
+
+        return ID;
+    }
+
+        public int setFriendUserAvailable(int ID, InetAddress inetAddress, boolean available){
+            CFriendUser cFriendUser = cFriendUserMap.get(ID);
+            cFriendUser.changeAvailability(available);
+            cFriendUser.setInetAddress(inetAddress);
+            cFriendUserMap.put(ID, cFriendUser);
+            return ID;
+        }
+
+        public int setFriendConnectionData(int ID, BigInteger rID, BigInteger sID){
+            CFriendUser cFriendUser = cFriendUserMap.get(ID);
+            cFriendUser.setConnectionParameters(rID, sID);
+            cFriendUserMap.put(ID, cFriendUser);
+            return ID;
+        }
+
+    public CFriendUser getUser(int ID) {
+        return cFriendUserMap.get(ID);
+    }
+
+    BigInteger computeConnectionKey(int ID){
+
+        CFriendUser cFriendUser = cFriendUserMap.get(ID);
+        BigInteger rID = cFriendUser.getRID_();
+        BigInteger uID = cFriendUser.getUID_();
+        int my_tID =  cFriendUser.getTID_();
+        int my_sID = CClientConstraints.getInstance().getS_ID();
+        BigInteger y = CClientConstraints.getInstance().getY();
+        int h1 = CClientConstraints.H1(rID.add(BigInteger.valueOf(ID)));
+        BigInteger z1 = uID.multiply(rID.multiply(y)).pow(h1+my_tID+my_sID);
+        BigInteger z2 = uID.pow(my_tID);
+
+
+        BigInteger result = CClientConstraints.H2(z1.add(z2));
+        return result;
+    }
+}
