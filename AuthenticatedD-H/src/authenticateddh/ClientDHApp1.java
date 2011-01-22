@@ -12,6 +12,8 @@
 package authenticateddh;
 
 import java.math.BigInteger;
+import java.util.TreeMap;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 /**
@@ -21,6 +23,9 @@ import javax.swing.JOptionPane;
 public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
 
     private static ClientDHApp1 instance;
+    TreeMap<Integer, MessageWindow> cMessageWindowsMap;
+    //private int listIndex_;
+    private DefaultListModel listModel;
 
     public static synchronized ClientDHApp1 getInstance() {
 	if (instance == null) {
@@ -30,6 +35,7 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     }
     /** Creates new form ClientDHApp1 */
     public ClientDHApp1() {
+        cMessageWindowsMap = new TreeMap();
         //initComponents();
     }
 
@@ -43,23 +49,36 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
         jButtonRozmowa = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList();
+        jButtonDodaj = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItemConnect = new javax.swing.JMenuItem();
         jMenuItemVerify = new javax.swing.JMenuItem();
+        jMenuItemDisconnect = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setText("Zalogowani użytkownicy:");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
-
         jButtonRozmowa.setText("Rozpocznij rozmowę");
+        jButtonRozmowa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRozmowaActionPerformed(evt);
+            }
+        });
+
+        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane1.setViewportView(jList1);
+
+        jButtonDodaj.setText("Dodaj Usera");
+        jButtonDodaj.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDodajActionPerformed(evt);
+            }
+        });
 
         jMenu1.setText("File");
 
@@ -79,6 +98,9 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         });
         jMenu1.add(jMenuItemVerify);
 
+        jMenuItemDisconnect.setText("Disconnect");
+        jMenu1.add(jMenuItemDisconnect);
+
         jMenuBar1.add(jMenu1);
 
         setJMenuBar(jMenuBar1);
@@ -90,21 +112,27 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
-                    .addComponent(jLabel1)
-                    .addComponent(jButtonRozmowa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(18, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel1)
+                            .addComponent(jButtonRozmowa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButtonDodaj)))
+                .addContainerGap(38, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jButtonDodaj))
                 .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButtonRozmowa)
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         pack();
@@ -118,10 +146,36 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     }//GEN-LAST:event_jMenuItemConnectActionPerformed
 
     private void jMenuItemVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemVerifyActionPerformed
-       if(checkKey()) JOptionPane.showMessageDialog(null, "Weryfikacja kluczy zakonczona sukcesem", "Gratulacje", JOptionPane.INFORMATION_MESSAGE);
+        //JOptionPane okno = new JOptionPane();
+        JOptionPane.showMessageDialog(null, "Po wcisnieciu przyciku OK nastąpi weryfikacja klucza.\n Może to potrwać kilkanaście sekund", "Uwaga", JOptionPane.INFORMATION_MESSAGE);
+        //okno.
+        if(checkKey()) JOptionPane.showMessageDialog(null, "Weryfikacja kluczy zakonczona sukcesem", "Gratulacje", JOptionPane.INFORMATION_MESSAGE);
        else JOptionPane.showMessageDialog(null, "Weryfikacja kluczy nieudana", "Gratulacje", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItemVerifyActionPerformed
 
+    private void jButtonRozmowaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRozmowaActionPerformed
+        // TODO add your handling code here:
+        int index = jList1.getSelectedIndex();
+        String znaleziony = (String) listModel.get(index);
+        String[] wynik= znaleziony.split(" ");
+        //addUserToList(wynik[0], wynik[1]);
+        openMessageWindow(Integer.parseInt(wynik[0]), wynik[1]);
+    }//GEN-LAST:event_jButtonRozmowaActionPerformed
+
+    private void jButtonDodajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDodajActionPerformed
+        // TODO add your handling code here:
+        addUserToList(5, "Rafał");
+    }//GEN-LAST:event_jButtonDodajActionPerformed
+
+    private void openMessageWindow(int ID, String nick){
+        if(cMessageWindowsMap.containsKey(ID))JOptionPane.showMessageDialog(null, "Już prowadzisz rozmowę z tym użytkownikiem", "Błąd", JOptionPane.ERROR_MESSAGE);
+        else{
+            MessageWindow mw = new MessageWindow(ID, nick);
+            //System.out.println("dodano usera o id " + Integer.toString(ID) + " " + nick);
+            mw.setVisible(true);
+            cMessageWindowsMap.put(ID, mw);
+        }
+    }
 
     private boolean checkKey(){
         while(CClientConstraints.getInstance().getID()== 0){}
@@ -134,12 +188,26 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         BigInteger right = rID.multiply(y.pow(CClientConstraints.H1(rID.add(BigInteger.valueOf(ID)))));
         return true;
     }
+
+    public void addUserToList(int ID, String nick){
+        //listModel.insertElementAt(nick, ID);
+        //listModel.add(ID, nick);
+        //listModel.setSize(10);
+        //listModel.setElementAt(nick, ID);
+        listModel.addElement(Integer.toString(ID) + " " + nick);
+    }
     /**
     * @param args the command line arguments
     */
             public void run() {
                 //new ClientDHApp().setVisible(true);
                 initComponents();
+                listModel = new DefaultListModel();
+                //listModel.addElement("Jane Doe");
+                //listModel.ensureCapacity(10);
+                jList1.setModel(listModel);
+               // ListModel lm = jList1.getModel();
+                //listModel = (DefaultListModel) lm;
                 setVisible(true);
                 //CCurrentCommand.getInstance().setCurrentCommand("Register");
                 //CClientConnector.getInstance().connect("localhost");
@@ -147,14 +215,16 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
             }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonDodaj;
     private javax.swing.JButton jButtonRozmowa;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItemConnect;
+    private javax.swing.JMenuItem jMenuItemDisconnect;
     private javax.swing.JMenuItem jMenuItemVerify;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 
 }

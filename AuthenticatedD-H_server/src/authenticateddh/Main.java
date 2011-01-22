@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 public class Main {
 
- private CServerConnector cServerConnector;
+ //private CServerConnector cServerConnector;
  private ServerDHApp serverApp;
     /**
      * @param args the command line arguments
