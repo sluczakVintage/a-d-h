@@ -153,5 +153,31 @@ public class CClientConstraints {
             BigInteger temp = new BigInteger(length, random);
             return temp.intValue();
     }
+
+    // w tej metodzie umiescilem rzeczy ktore powinny byc zrobione przed wyslaniem
+    // wiadomosc CMessageHello do CFriendUser'a
+    // @param ID id usera z ktorym bedziemy sie witac
+    public void prepareToHello(int ID){
+        CFriendUser cFriendUser = CFriendUserManager.getInstance().getUser(ID);
+
+        //te 3 pola (ponizej) wysylamy  podczas wiadomosci CMessageHello
+        int IDs = ID;
+        BigInteger rID = r_ID;
+        BigInteger UID = cFriendUser.generateMyUID_();
+
+    }
+
+    // w tej metodzie umiescilem rzeczy ktore powinny byc zrobione po odebraniu
+    // wiadomosci CMessageHello od CFriendUser'a
+    // @param tutaj sa rzeczy odebrane w wiadomosci od kolezki
+    // @return metoda zwraca klucz ktorym dalej bedziemy szyfrowac
+    // w algorytmie szyfrowania symetrycznego kazda wiadomosc
+    // UWAGA, ostatnia linijka moze sie wykonywac zajebiscie dlugo
+    // nie byla jeszcze testowana ;)
+    public BigInteger processHelloData (int ID, BigInteger friend_rID, BigInteger friend_uID){
+         CFriendUser cFriendUser = CFriendUserManager.getInstance().getUser(ID);
+         cFriendUser.setConnectionParameters(friend_rID, friend_uID);
+         return CFriendUserManager.getInstance().computeConnectionKey(ID);
+    }
 }
 
