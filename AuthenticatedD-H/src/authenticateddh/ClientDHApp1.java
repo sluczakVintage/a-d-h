@@ -184,7 +184,7 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         // TODO add your handling code here:
         int index = jList1.getSelectedIndex();
         String znaleziony = (String) listModel.get(index);
-        String[] wynik= znaleziony.split(" ");
+        String[] wynik = znaleziony.split(" ");
         //addUserToList(wynik[0], wynik[1]);
         openMessageWindow(Integer.parseInt(wynik[0]), wynik[1]);
     }//GEN-LAST:event_jButtonRozmowaActionPerformed

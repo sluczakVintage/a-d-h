@@ -157,8 +157,8 @@ public class CClientConstraints {
     // w tej metodzie umiescilem rzeczy ktore powinny byc zrobione przed wyslaniem
     // wiadomosc CMessageHello do CFriendUser'a
     // @param ID id usera z ktorym bedziemy sie witac
-    public void prepareToHello(int ID){
-        CFriendUser cFriendUser = CFriendUserManager.getInstance().getUser(ID);
+    public void prepareToHello(int friendID){
+        CFriendUser cFriendUser = CFriendUserManager.getInstance().getUser(friendID);
 
         //te 3 pola (ponizej) wysylamy  podczas wiadomosci CMessageHello
         int IDs = ID;

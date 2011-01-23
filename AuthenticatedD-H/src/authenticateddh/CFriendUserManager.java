@@ -60,7 +60,7 @@ public class CFriendUserManager {
     public void resetCFriendUserMap(CLoggedList loggedList) {
         cFriendUserMap.clear();
         ClientDHApp1.getInstance().cleanupUserList();
-        System.out.println(loggedList.size());
+        //System.out.println(loggedList.size());
 
         for(int i = 0; i < loggedList.size() ; i++) {
             CUser tempUser = loggedList.get(i);
