@@ -25,11 +25,15 @@ public class MessageWindow extends javax.swing.JFrame {
         //initComponents();
     }
 
-    public MessageWindow(int ID_, String nickname_) {
+    public MessageWindow(int ID_, String nickname) {
         this.ID_ = ID_;
-        this.nickname_ = nickname_;
+        this.nickname_ = nickname;
         setTitle("Rozmowa z " + nickname_);
         initComponents();
+    }
+
+    public String getNickname_() {
+        return nickname_;
     }
 
     /** This method is called from within the constructor to
@@ -131,6 +135,7 @@ public class MessageWindow extends javax.swing.JFrame {
         String text = jTextFieldMessage.getText();
         if (!text.equals("")){
             createMessage("Ja", text);
+            ClientDHApp1.getInstance().processOutcomingMessage(ID_, text);
         }
         // TODO tutaj trzeba wstawić wysłanie wiadomości do innego Usera
     }//GEN-LAST:event_jButtonWyslijActionPerformed
@@ -139,6 +144,7 @@ public class MessageWindow extends javax.swing.JFrame {
         String text = jTextFieldMessage.getText();
         if (!text.equals("")){
             createMessage("Ja", text);
+            ClientDHApp1.getInstance().processOutcomingMessage(ID_, text);
         }        
         // TODO tutaj trzeba wstawić wysłanie wiadomości do innego Usera
     }//GEN-LAST:event_jTextFieldMessageActionPerformed

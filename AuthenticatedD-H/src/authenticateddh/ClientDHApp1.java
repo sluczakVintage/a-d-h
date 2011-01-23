@@ -166,8 +166,10 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     private void jMenuItemConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemConnectActionPerformed
 
 
-       CCurrentCommand.getInstance().setCurrentCommand(CCommandType.CT_REGISTER);
-       CClientConnector.getInstance().startThread();
+        ConnectWindow connectWindow = new ConnectWindow();
+        connectWindow.setVisible(true);
+       //CCurrentCommand.getInstance().setCurrentCommand(CCommandType.CT_REGISTER);
+       //CClientConnector.getInstance().startThread();
        //if(checkKey()) System.out.println("dziala weryfikacja");
        //else System.out.println("nie dziala weryfikacja");
     }//GEN-LAST:event_jMenuItemConnectActionPerformed
@@ -183,10 +185,16 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     private void jButtonRozmowaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRozmowaActionPerformed
         // TODO add your handling code here:
         int index = jList1.getSelectedIndex();
-        String znaleziony = (String) listModel.get(index);
-        String[] wynik = znaleziony.split(" ");
-        //addUserToList(wynik[0], wynik[1]);
-        openMessageWindow(Integer.parseInt(wynik[0]), wynik[1]);
+        if(index==-1){
+            JOptionPane.showMessageDialog(null, "Proszę najpierw wybrać użytkownika z listy", "Błąd", JOptionPane.ERROR_MESSAGE);
+        }else{
+            String znaleziony = (String) listModel.get(index);
+            String[] wynik = znaleziony.split(" ");
+            //addUserToList(wynik[0], wynik[1]);
+            openMessageWindow(Integer.parseInt(wynik[0]), wynik[1]);
+        }
+                //System.out.println(index);
+
     }//GEN-LAST:event_jButtonRozmowaActionPerformed
 
     private void jButtonDodajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDodajActionPerformed
@@ -209,12 +217,16 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void openMessageWindow(int ID, String nick){
-        if(cMessageWindowsMap.containsKey(ID))JOptionPane.showMessageDialog(null, "Już prowadzisz rozmowę z tym użytkownikiem", "Błąd", JOptionPane.ERROR_MESSAGE);
+        if(cMessageWindowsMap.containsKey(ID)){
+            JOptionPane.showMessageDialog(null, "Już prowadzisz rozmowę z tym użytkownikiem", "Błąd", JOptionPane.ERROR_MESSAGE);
+            //return null;
+        }
         else{
             MessageWindow mw = new MessageWindow(ID, nick);
             //System.out.println("dodano usera o id " + Integer.toString(ID) + " " + nick);
             mw.setVisible(true);
             cMessageWindowsMap.put(ID, mw);
+            //return mw;
         }
     }
 
@@ -241,6 +253,24 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
             jMenuItemConnect.setEnabled(!lastState);
 
     }
+
+    public void processIncomingMessage(int ID, String message){
+        MessageWindow mw;
+        String nick=CFriendUserManager.getInstance().getUser(ID).getNickname_();
+        if(cMessageWindowsMap.containsKey(ID)){
+            mw=cMessageWindowsMap.get(ID);
+            //nick=mw.getNickname_();
+            mw.createMessage(nick, message);
+        }else{
+            openMessageWindow(ID, nick);
+            mw=cMessageWindowsMap.get(ID);
+            mw.createMessage(nick, message);
+        }
+    }
+
+    public void processOutcomingMessage(int ID, String message){
+        //tutaj niestety Fester musi cos skrobnac :)
+    }
     synchronized public void addUserToList(int ID, String nick){
         //listModel.insertElementAt(nick, ID);
         //listModel.add(ID, nick);
@@ -252,18 +282,10 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     * @param args the command line arguments
     */
             public void run() {
-                //new ClientDHApp().setVisible(true);
                 initComponents();
                 listModel = new DefaultListModel();
-                //listModel.addElement("Jane Doe");
-                //listModel.ensureCapacity(10);
                 jList1.setModel(listModel);
-               // ListModel lm = jList1.getModel();
-                //listModel = (DefaultListModel) lm;
                 setVisible(true);
-                //CCurrentCommand.getInstance().setCurrentCommand("Register");
-                CClientConnector.getInstance().start();//.connect("localhost");
-                //System.out.println("Podłączyłem sie");
             }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
