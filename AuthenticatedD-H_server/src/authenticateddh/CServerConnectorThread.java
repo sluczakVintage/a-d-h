@@ -53,24 +53,27 @@ public class CServerConnectorThread extends Thread{
 
         CPacket packetOut = new CPacket();
         CPacket packetIn = new CPacket();
-        CCommand command;
+        CCommand command = new CCommand(CCommandType.CT_NONE, 0);
         boolean communication = true;
-
+        
         try {
 
             while(communication) {
-            //Odbieranie
-            packetIn = (CPacket) oInputStream.readObject();
+                //Odbieranie
+                packetIn = (CPacket) oInputStream.readObject();
 
-            command = cCommunicationProtocolServer.processInput(packetIn, socket);
+                command = cCommunicationProtocolServer.processInput(packetIn, socket);
 
-            //Wysylanie
-            packetOut = cCommunicationProtocolServer.processOutput(command);
+                //Wysylanie
+                packetOut = cCommunicationProtocolServer.processOutput(command);
 
-            oOutputStream.writeObject(packetOut);
-            oOutputStream.flush();
-            oOutputStream.reset();
-            sleep(1000);
+                oOutputStream.writeObject(packetOut);
+                oOutputStream.flush();
+                oOutputStream.reset();
+                sleep(100);
+
+                if(!CServerConnector.getInstance().getListeningState())
+                    communication = false;
             }
             //Zamykanie
             oInputStream.close();
@@ -78,14 +81,16 @@ public class CServerConnectorThread extends Thread{
 
             socket.close();
 
-            System.out.println("Killing Thread");
+
         } catch (InterruptedException ex) {
             Logger.getLogger(CServerConnectorThread.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(CServerConnectorThread.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(CServerConnectorThread.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(CServerConnectorThread.class.getName()).log(Level.SEVERE, null, ex);
+            CUserManager.getInstance().setUserAvailable(command.getID(), false);
         }
+        System.out.println("Killing Thread");
     }
 
 

@@ -5,28 +5,36 @@
 
 package authenticateddh.messageformats;
 
+
 import authenticateddh.CLoggedList;
 
 /**
  *
  * @author Sebastian
  */
-public class CMessageLogin extends CMessage {
+public class CMessageUserList extends CMessage {
+
 
     private int ID;
     private String login;
     private String passwordHash;
     private CLoggedList loggedList;
 
-    public CMessageLogin(CLoggedList loggedList) {
-        this.ID = 0;
+
+    public void setUserList(CLoggedList cLoggedList) {
+        this.loggedList = cLoggedList;
+    }
+
+    public CLoggedList getUserList() {
+        return loggedList;
+    }
+
+    public CMessageUserList(CLoggedList loggedList) {
         this.loggedList = loggedList;
     }
 
-    public CMessageLogin(int ID, String login, String passwordHash) {
-        this.ID = ID;
+    public CMessageUserList(int ID, String login) {
         this.login = login;
-        this.passwordHash = passwordHash;
         this.loggedList = null;
     }
 
@@ -38,17 +46,7 @@ public class CMessageLogin extends CMessage {
         return login;
     }
 
-    public CLoggedList getLoggedList() {
-        return loggedList;
-    }
-
-
     public String getPasswordHash() {
         return passwordHash;
     }
-
-    public void setLoggedList(CLoggedList loggedList) {
-        this.loggedList = loggedList;
-    }
-
 }

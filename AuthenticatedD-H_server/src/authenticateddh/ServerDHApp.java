@@ -134,8 +134,7 @@ public class ServerDHApp extends javax.swing.JFrame implements Runnable {
 
     private void jButtonStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStartActionPerformed
         try {
-
-            cServerConnector = CServerConnector.getInstance();
+            CServerConnector.getInstance().startServerConnector();
             new Thread(cServerConnector).start();
             KeyGenerationCenter.getInstance();
 
@@ -147,7 +146,13 @@ public class ServerDHApp extends javax.swing.JFrame implements Runnable {
     }//GEN-LAST:event_jButtonStartActionPerformed
 
     private void jButtonStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStopActionPerformed
-    jTextAreaLog.append("Tu powinien dzialac stop\n");        // TODO add your handling code here:
+        try {
+            jTextAreaLog.append("Tu powinien dzialac stop\n"); // TODO add your handling code here:
+            CServerConnector.getInstance().stopServerConnector();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerDHApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }//GEN-LAST:event_jButtonStopActionPerformed
 
     public void addLog(String message){
@@ -155,8 +160,24 @@ public class ServerDHApp extends javax.swing.JFrame implements Runnable {
     }
 
     public void run(){
-        initComponents();
-        setVisible(true);
+        try {
+            initComponents();
+            setVisible(true);
+            cServerConnector = CServerConnector.getInstance();
+        }
+        /**
+         * @param args the command line arguments
+         */
+        //public static void main(String args[]) {
+        //java.awt.EventQueue.invokeLater(new Runnable() {
+        // public void run() {
+        // new ServerDHApp().setVisible(true);
+        //}
+        // });
+        //}
+        catch (IOException ex) {
+            Logger.getLogger(ServerDHApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     /**
     * @param args the command line arguments

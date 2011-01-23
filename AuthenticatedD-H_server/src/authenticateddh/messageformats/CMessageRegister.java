@@ -5,6 +5,7 @@
 
 package authenticateddh.messageformats;
 
+import authenticateddh.CLoggedList;
 import java.math.BigInteger;
 
 /**
@@ -20,6 +21,10 @@ public class CMessageRegister extends CMessage {
     private BigInteger q;
     private BigInteger r_ID;
     private int s_ID;
+    private CLoggedList loggedList;
+
+
+
 
     public CMessageRegister(String nickname, String passwordHash, int ID, BigInteger g, BigInteger y, BigInteger q, BigInteger r_ID, int s_ID) {
         this.nickname = nickname;
@@ -73,6 +78,14 @@ public class CMessageRegister extends CMessage {
 
     public int getS_ID() {
         return s_ID;
+    }
+
+    public void setUserList(CLoggedList cLoggedList) {
+        this.loggedList = cLoggedList;
+    }
+
+    public CLoggedList getUserList() {
+        return loggedList;
     }
 
 }

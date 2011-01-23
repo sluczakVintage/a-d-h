@@ -50,13 +50,26 @@ public class CServerConnector implements Runnable{
         serverChannel.socket().bind(new InetSocketAddress(ServerConstraints.TCP_PORT));
 
         
-        while (listening)
+        while (listening) 
             new CServerConnectorThread(serverChannel.accept()).start();
+            
 
         serverChannel.close();
         }
          catch ( IOException ex) {
             System.err.println("IO Exception " + ex.getMessage());
        }
+    }
+
+    public void stopServerConnector() {
+        listening = false;
+    }
+
+    public void startServerConnector() {
+        listening = true;
+    }
+
+    public boolean getListeningState() {
+        return listening;
     }
 }

@@ -5,6 +5,7 @@
 
 package authenticateddh.messageformats;
 
+import authenticateddh.CCommandType;
 import java.net.InetAddress;
 
 /**
@@ -12,26 +13,50 @@ import java.net.InetAddress;
  * @author Sebastian
  */
 public class CCommand {
-    private String command;
+    private CCommandType command_;
     private int ID;
     private InetAddress inetAddress;
 
-    public CCommand(String command, int ID) {
-        this.command = command;
+    public CCommand(CCommandType command, int ID) {
+        this.command_ = command;
         this.ID = ID;
     }
 
-    public boolean equals(String string) {
-        return string.equals(command);
+//    public boolean equals(String string) {
+//        return string.equals(command);
+//    }
+
+     /**
+     *
+     * @param command
+     * @return
+     */
+    public boolean equals(CCommandType command_) {
+        return this.command_ == command_;
+    }
+    /**
+     *
+     * @param command
+     */
+    public void setCommand(CCommandType command_) {
+        this.command_ = command_;
     }
 
-    public void setCommand(String command) {
-        this.command = command;
+    /**
+     *
+     * @return
+     */
+    public CCommandType getCommand() {
+        return command_;
     }
+    
+//    public void setCommand(String command) {
+//        this.command = command;
+//    }
 
-    public String getCommand() {
-        return command;
-    }
+//    public String getCommand() {
+//        return command;
+//    }
 
     public void setID(int ID) {
         this.ID = ID;

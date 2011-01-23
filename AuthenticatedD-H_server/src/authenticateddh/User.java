@@ -45,7 +45,6 @@ public class User {
         this.nickname = nickname;
         this.available = available;
 
-        //@todo s_ID r_ID sa puste!!! trzeba je przypisac....
 
         System.out.println("Utworzono nowego usera ");
         //System.out.println("ID " + id + " nickname " + nickname + " passwordHash " + passwordHash + " IP " + inetAddress.getHostAddress());
@@ -135,31 +134,31 @@ public class User {
         this.available = available;
     }
 
-    void setNickname(String nickname) {
+    public void setNickname(String nickname) {
         this.nickname = nickname;
     }
 
-    void setInetAddress(InetAddress address) {
+    public void setInetAddress(InetAddress address) {
         this.inetAddress = address;
     }
 
-    int getID() {
+    public int getID() {
         return ID_;
     }
 
-    BigInteger getG() {
+    public BigInteger getG() {
         return generator_;
     }
 
-    BigInteger getY() {
+    public BigInteger getY() {
         return y_;
     }
 
-    int getS_ID() {
+    public int getS_ID() {
         return sID_;
     }
 
-    BigInteger getR_ID() {
+    public BigInteger getR_ID() {
         return rID_;
     }
 }
