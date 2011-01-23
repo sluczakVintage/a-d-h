@@ -11,8 +11,9 @@ package authenticateddh;
  */
 public class CCurrentCommand {
 
-    private String command = "none";
+    //private String command = "none";
 
+    private CCommandType command = CCommandType.CT_NONE;
     private static CCurrentCommand instance;
 
     //Singleton
@@ -33,16 +34,25 @@ public class CCurrentCommand {
     throw new CloneNotSupportedException();
     }
 
-    public synchronized  String getCurrentCommand() {
+    /**
+     *
+     * @param command
+     * @return
+     */
+    public boolean equals(CCommandType command) {
+        return this.command == command;
+    }
+
+    public synchronized  CCommandType getCurrentCommand() {
         return command;
     }
 
-    public synchronized void setCurrentCommand(String command) {
+    public synchronized void setCurrentCommand(CCommandType command) {
         this.command = command;
     }
 
     public synchronized void clearCurrentCommand() {
-        command = "none";
+        command = CCommandType.CT_NONE;
     }
 
 }

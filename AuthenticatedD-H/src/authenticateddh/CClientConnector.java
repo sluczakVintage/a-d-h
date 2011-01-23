@@ -29,6 +29,7 @@ public class CClientConnector extends Thread {
     // Gniazdko klienta
     private Socket clientSocket;
     private SocketChannel sChannel;
+    private boolean communication = false;
 
     //Singleton
     private CClientConnector()
@@ -47,45 +48,82 @@ public class CClientConnector extends Thread {
     public Object clone() throws CloneNotSupportedException {
     throw new CloneNotSupportedException();
     }
+
+    public void stopThread() {
+        if(communication)
+            disconnect();
+        communication = false;
+    }
+
+    public void startThread() {
+        communication = true;
+    }
     //polaczenie
     public void run()
-    //synchronized public boolean connect(String ip)
+    
     {
-        
-        try {
-            sChannel = SocketChannel.open();
-            sChannel.configureBlocking(true);
+        //petla ciagla
+        while(true) {
+            //jesli komunikacja ma trwac
+            if(communication) {
+                try {
+                    sChannel = SocketChannel.open();
+                    sChannel.configureBlocking(true);
 
-            System.out.println("Connection started");
-            if(standardConnect(CClientConstraints.SERVER_IP, CClientConstraints.TCP_PORT)) {
-                System.out.println("Standard connection completed");
+                    System.out.println("Connection started");
+                    if(standardConnect(CClientConstraints.SERVER_IP, CClientConstraints.TCP_PORT)) {
+                        System.out.println("Standard connection completed");
+                        ClientDHApp1.getInstance().toggleButtons();
+                        standardCommunication();
+                    }
+                    else
+                    {
+                        System.out.println("Unable to connect");
+                        communication = false;
+                    }
+                    
+
+                } catch (UnknownHostException ex) {
+                    Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
+                    //return false;
+                } catch (IOException ex) {
+                    Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
+                    //return false;
+                }
+                System.out.println("watek przerwany");
             }
-            standardCommunication();
-            disconnect();
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
-            //return false;
-        } catch (IOException ex) {
-            Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
-            //return false;
+            //przespij sie
+            try {
+                sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        System.out.println("działa communication");
-        //return true;
     }
     //podlaczenie
-    synchronized private boolean standardConnect(String hostname, int port) throws UnknownHostException, IOException
+    synchronized private boolean standardConnect(String hostname, int port)
     {
-        return sChannel.connect(new InetSocketAddress(hostname, port));
-        //clientSocket = new Socket( hostname, port );
+        try {
+            return sChannel.connect(new InetSocketAddress(hostname, port));
+            //clientSocket = new Socket( hostname, port );
+        } catch (IOException ex) {
+            Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
         
     }
 
-    synchronized private void disconnect() throws UnknownHostException, IOException
+    private void disconnect() 
     {
-        sChannel.close();
-        System.out.println("Disconnected");
+        try {
+            sChannel.close();
+            System.out.println("Disconnected");
+            ClientDHApp1.getInstance().toggleButtons();
+        } catch (IOException ex) {
+            Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     //komunikacja
@@ -101,13 +139,11 @@ public class CClientConnector extends Thread {
         CPacket packetOut = new CPacket();
         CPacket packetIn = new CPacket();
 
-        boolean communication = true;
-
         boolean result = false;
 
         try {
             while(communication) {
-                if(!CCurrentCommand.getInstance().getCurrentCommand().equals("none")) {
+                if(!CCurrentCommand.getInstance().getCurrentCommand().equals(CCommandType.CT_NONE)) {
                     packetOut = CCommunicationProtocol.getInstance().processOutput(null);
 
                     oOutputStream.writeObject(packetOut);
@@ -122,6 +158,17 @@ public class CClientConnector extends Thread {
                     result = CCommunicationProtocol.getInstance().processInput(packetIn);
 
                     oOutputStream.reset();
+
+                    while(CCurrentCommand.getInstance().getCurrentCommand().equals(CCommandType.CT_NONE)) {
+                         if(!communication) {
+                            return result;
+                        }
+                        sleep(100);
+                    }
+                }
+                if(!communication) {
+                    
+                        return result; 
                 }
                 sleep(1000);
             }
@@ -137,10 +184,9 @@ public class CClientConnector extends Thread {
             System.err.println(ex.getMessage());
         } catch (NullPointerException ex) {
             System.err.println(ex.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("działa communication");
+        } 
+        System.out.println("komunikacja zakonczona");
         return result;
     }
+
 }

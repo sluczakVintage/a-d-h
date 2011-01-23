@@ -5,6 +5,7 @@
 
 package authenticateddh.messageformats;
 
+import authenticateddh.CCommandType;
 import java.io.Serializable;
 
 /**
@@ -13,14 +14,15 @@ import java.io.Serializable;
  */
 public class CPacket implements Serializable {
 
-    private String flag;
+    //private String flag;
+    private CCommandType flag;
     private CMessage message;
     
     public CPacket() {
 
     }
 
-    public void setFlag(String flag_) {
+    public void setFlag(CCommandType flag_) {
         flag = flag_;
     }
 
@@ -29,7 +31,7 @@ public class CPacket implements Serializable {
     }
 
 
-    public String getFlag() {
+    public CCommandType getFlag() {
         return this.flag;
     }
 

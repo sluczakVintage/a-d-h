@@ -1,3 +1,4 @@
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -6,18 +7,17 @@
 package authenticateddh;
 
 import authenticateddh.messageformats.CMessage;
-import authenticateddh.messageformats.CMessageComm;
-import authenticateddh.messageformats.CMessageConnect;
-import authenticateddh.messageformats.CMessageHello;
 import authenticateddh.messageformats.CMessageLogin;
 import authenticateddh.messageformats.CMessageRegister;
+import authenticateddh.messageformats.CMessageUserList;
 import authenticateddh.messageformats.CPacket;
-import java.math.BigInteger;
 
 /**
  *
  * @author Sebastian
  */
+
+
 public class CCommunicationProtocol {
 
       private static CCommunicationProtocol instance;
@@ -40,67 +40,60 @@ public class CCommunicationProtocol {
     throw new CloneNotSupportedException();
     }
 
-    synchronized public boolean processInput(CPacket packet) {
+    public boolean processInput(CPacket packet) {
 
         System.out.println("Processing input ... FLAG = " + packet.getFlag());
-        String command = "Error!";
+        CCommandType command = CCommandType.CT_ERROR;
 
          System.out.println("Processing input... Flag = " + packet.getFlag());
 
-         if(packet.getFlag().equals("Register")) {
+         if(packet.getFlag() == CCommandType.CT_REGISTER) {
              command = packet.getFlag();
              processRegistrationData(packet.getCMessage());
          }
-         else if(packet.getFlag().equals("Login")) {
+         else if(packet.getFlag() == CCommandType.CT_LOGIN) {
              command = packet.getFlag();
-             
+             processLoginData(packet.getCMessage());
         }
-        else if(packet.getFlag().equals("Hello")) {
-             command =packet.getFlag();
+        else if(packet.getFlag() == CCommandType.CT_LIST) {
+             command = packet.getFlag();
+             processUserList(packet.getCMessage());
         }
-        else if(packet.getFlag().equals("Message")) {
-             command =packet.getFlag();
-        }
-        else if(packet.getFlag().equals("Connect")) {
-             command =packet.getFlag();
-        }
+
         else {
              //command = "Error!!";
         }
         return true;
     }
 
-    synchronized public CPacket processOutput(String message) {
+    public CPacket processOutput(String message) {
 
         CPacket packet = new CPacket();
-        String command = CCurrentCommand.getInstance().getCurrentCommand();
+        CCommandType command = CCurrentCommand.getInstance().getCurrentCommand();
 
-        System.out.println("Processing output... Command = " + command);
+        System.out.println("Processing output... Command = " + command.toString());
 
-        if(command.equals("Register")) {
+        if(CCurrentCommand.getInstance().getCurrentCommand() == CCommandType.CT_REGISTER) {
             packet = prepareCMessageRegister(command);
         }
-        else if(command.equals("Login")) {
+        else if(CCurrentCommand.getInstance().getCurrentCommand() == CCommandType.CT_LOGIN) {
             packet = prepareCMessageLogin(command);
         }
-        else if(command.equals("Hello")) {
-            packet = prepareCMessageHello(command);
-        }
-        else if(command.equals("Message")) {
-            packet = prepareCMessageComm(command, message);
-        }
-        else if(command.equals("Connect")) {
-            packet = prepareCMessageConnect(command);
+        else if(CCurrentCommand.getInstance().getCurrentCommand() == CCommandType.CT_LIST) {
+            packet = prepareCMessageUserList(command);
         }
         else {
-            packet.setFlag("error");
+            packet.setFlag(CCommandType.CT_ERROR);
         }
 
         CCurrentCommand.getInstance().clearCurrentCommand();
         return packet;
     }
 
-    private CPacket prepareCMessageRegister(String command) {
+/////////////////// KOMUNIKACJA KLIENT - SERWER /////////////////////////
+
+    //////////////output preparing
+    private CPacket prepareCMessageRegister(CCommandType command) {
         CPacket packet = new CPacket();
 
         CMessageRegister cMessageRegister = new CMessageRegister(CClientConstraints.getInstance().getNickname(), CClientConstraints.getInstance().getPasswordHash());
@@ -110,7 +103,7 @@ public class CCommunicationProtocol {
         return packet;
     }
 
-    private CPacket prepareCMessageLogin(String command) {
+    private CPacket prepareCMessageLogin(CCommandType command) {
         CPacket packet = new CPacket();
 
         CMessageLogin cMessageLogin = new CMessageLogin(CClientConstraints.getInstance().getID(), CClientConstraints.getInstance().getNickname(), CClientConstraints.getInstance().getPasswordHash());
@@ -121,41 +114,20 @@ public class CCommunicationProtocol {
         return packet;
     }
 
-    private CPacket prepareCMessageComm(String command, String message) {
+    private CPacket prepareCMessageUserList(CCommandType command) {
         CPacket packet = new CPacket();
 
-        //@todo -> kodowanie wiadomosci
-        CMessageComm cMessageComm = new CMessageComm("tajny kod");
+
+        CMessageUserList cMessageUserList = new CMessageUserList(CClientConstraints.getInstance().getID(), CClientConstraints.getInstance().getNickname());
 
         packet.setFlag(command);
-        packet.setCMessage(cMessageComm);
+        packet.setCMessage(cMessageUserList);
 
         return packet;
     }
 
-    private CPacket prepareCMessageHello(String command) {
-        CPacket packet = new CPacket();
 
-        //@todo -> r i u
-        CMessageHello cMessageHello = new CMessageHello(0, new BigInteger("1"), new BigInteger("1"));
-
-        packet.setFlag(command);
-        packet.setCMessage(cMessageHello);
-
-        return packet;
-    }
-
-    private CPacket prepareCMessageConnect(String command) {
-        CPacket packet = new CPacket();
-
-        //@todo -> ID z kim chcemy gadac
-        CMessageConnect cMessageConnect = new CMessageConnect(0);
-
-        packet.setFlag(command);
-        packet.setCMessage(cMessageConnect);
-
-        return packet;
-    }
+    //////////////// input processing
 
     private void processRegistrationData(CMessage cMessage) {
         CClientConstraints.getInstance().setUserData(((CMessageRegister)cMessage).getID(),
@@ -165,7 +137,24 @@ public class CCommunicationProtocol {
                 ((CMessageRegister)cMessage).getR_ID(),
                 ((CMessageRegister)cMessage).getS_ID());
         System.out.println("Udalo sie odebrać moje dane, ich długości w bitach to (oprócz S_ID): G " + CClientConstraints.getInstance().getG().bitLength() + " Y "  + CClientConstraints.getInstance().getY().bitLength() + " Q "  + CClientConstraints.getInstance().getQ().bitLength() + " S_ID "  + CClientConstraints.getInstance().getS_ID() + " R_ID "  + CClientConstraints.getInstance().getR_ID().bitLength());
+        CFriendUserManager.getInstance().resetCFriendUserMap( ((CMessageRegister)cMessage).getUserList());
 
     }
-  
+
+    private void processLoginData(CMessage cMessage) {
+        CClientConstraints.getInstance().setID(((CMessageLogin)cMessage).getID());
+        System.out.println("Moje nowe ID to: " + CClientConstraints.getInstance().getID());
+        CFriendUserManager.getInstance().resetCFriendUserMap( ((CMessageLogin)cMessage).getUserList());
+    }
+
+    private void processUserList(CMessage cMessage) {
+        CFriendUserManager.getInstance().resetCFriendUserMap( ((CMessageUserList)cMessage).getUserList());
+        System.out.println("Moje nowe ID to: " + CClientConstraints.getInstance().getID());
+    }
+
+
+
+
+
+
 }

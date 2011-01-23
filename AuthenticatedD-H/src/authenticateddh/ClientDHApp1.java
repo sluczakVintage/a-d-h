@@ -56,8 +56,10 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItemConnect = new javax.swing.JMenuItem();
-        jMenuItemVerify = new javax.swing.JMenuItem();
         jMenuItemDisconnect = new javax.swing.JMenuItem();
+        jMenuItemVerify = new javax.swing.JMenuItem();
+        jMenuItemUserList = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -90,7 +92,16 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         });
         jMenu1.add(jMenuItemConnect);
 
-        jMenuItemVerify.setText("Verify Keys");
+        jMenuItemDisconnect.setText("Disconnect");
+        jMenuItemDisconnect.setEnabled(false);
+        jMenuItemDisconnect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemDisconnectActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItemDisconnect);
+
+        jMenuItemVerify.setText("Verify");
         jMenuItemVerify.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemVerifyActionPerformed(evt);
@@ -98,8 +109,22 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         });
         jMenu1.add(jMenuItemVerify);
 
-        jMenuItemDisconnect.setText("Disconnect");
-        jMenu1.add(jMenuItemDisconnect);
+        jMenuItemUserList.setText("Download user list");
+        jMenuItemUserList.setEnabled(false);
+        jMenuItemUserList.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemUserListActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItemUserList);
+
+        jMenuItem3.setText("Exit");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem3);
 
         jMenuBar1.add(jMenu1);
 
@@ -139,8 +164,10 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItemConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemConnectActionPerformed
-       CCurrentCommand.getInstance().setCurrentCommand("Register");
-       CClientConnector.getInstance().start();
+
+
+       CCurrentCommand.getInstance().setCurrentCommand(CCommandType.CT_REGISTER);
+       CClientConnector.getInstance().startThread();
        //if(checkKey()) System.out.println("dziala weryfikacja");
        //else System.out.println("nie dziala weryfikacja");
     }//GEN-LAST:event_jMenuItemConnectActionPerformed
@@ -167,6 +194,20 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         addUserToList(5, "Rafał");
     }//GEN-LAST:event_jButtonDodajActionPerformed
 
+    private void jMenuItemUserListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemUserListActionPerformed
+        CCurrentCommand.getInstance().setCurrentCommand(CCommandType.CT_LIST);
+    }//GEN-LAST:event_jMenuItemUserListActionPerformed
+
+    private void jMenuItemDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDisconnectActionPerformed
+
+       CClientConnector.getInstance().stopThread();
+       cleanupUserList();
+    }//GEN-LAST:event_jMenuItemDisconnectActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+    System.exit(0);        
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
     private void openMessageWindow(int ID, String nick){
         if(cMessageWindowsMap.containsKey(ID))JOptionPane.showMessageDialog(null, "Już prowadzisz rozmowę z tym użytkownikiem", "Błąd", JOptionPane.ERROR_MESSAGE);
         else{
@@ -189,7 +230,18 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         return true;
     }
 
-    public void addUserToList(int ID, String nick){
+    synchronized public void cleanupUserList() {
+        listModel.clear();
+    }
+
+    synchronized public void toggleButtons() {
+       boolean lastState = jMenuItemConnect.isEnabled();
+            jMenuItemDisconnect.setEnabled(lastState);
+            jMenuItemUserList.setEnabled(lastState);
+            jMenuItemConnect.setEnabled(!lastState);
+
+    }
+    synchronized public void addUserToList(int ID, String nick){
         //listModel.insertElementAt(nick, ID);
         //listModel.add(ID, nick);
         //listModel.setSize(10);
@@ -210,7 +262,7 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
                 //listModel = (DefaultListModel) lm;
                 setVisible(true);
                 //CCurrentCommand.getInstance().setCurrentCommand("Register");
-                //CClientConnector.getInstance().connect("localhost");
+                CClientConnector.getInstance().start();//.connect("localhost");
                 //System.out.println("Podłączyłem sie");
             }
 
@@ -221,8 +273,10 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItemConnect;
     private javax.swing.JMenuItem jMenuItemDisconnect;
+    private javax.swing.JMenuItem jMenuItemUserList;
     private javax.swing.JMenuItem jMenuItemVerify;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables

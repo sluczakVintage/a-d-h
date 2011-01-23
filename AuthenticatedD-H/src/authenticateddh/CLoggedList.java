@@ -5,14 +5,16 @@
 
 package authenticateddh;
 
-import java.awt.List;
+
+import authenticateddh.messageformats.CUser;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  *
  * @author Sebastian
  */
-public class CLoggedList extends List implements Serializable {
+public class CLoggedList extends ArrayList<CUser> implements Serializable {
 
-    
+
 }

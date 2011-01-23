@@ -5,8 +5,11 @@
 
 package authenticateddh;
 
+import authenticateddh.messageformats.CUser;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.TreeMap;
 
 /**
@@ -32,7 +35,7 @@ public class CFriendUserManager {
         System.out.println("CFriendUserManager");
     }
 
-        public int addUser(int ID, String nickname, InetAddress inetAddress, boolean available) {
+    public int addUser(int ID, String nickname, InetAddress inetAddress, boolean available) {
         //KeyPair userKeyPairs = KeyGenerationCenter.getInstance().generateKeys(ID);
         cFriendUserMap.put(ID, new CFriendUser(ID, nickname, inetAddress, available));
 
@@ -54,6 +57,26 @@ public class CFriendUserManager {
             return ID;
         }
 
+    public void resetCFriendUserMap(CLoggedList loggedList) {
+        cFriendUserMap.clear();
+        ClientDHApp1.getInstance().cleanupUserList();
+        System.out.println(loggedList.size());
+
+        for(int i = 0; i < loggedList.size() ; i++) {
+            CUser tempUser = loggedList.get(i);
+            addUser(tempUser.getID_(), tempUser.getNickname_(), tempUser.getInetAddress(), tempUser.getAvailable());
+        }
+
+        Collection c = cFriendUserMap.values();
+        Iterator itr = c.iterator();
+
+        while(itr.hasNext()) {
+            CFriendUser tempUser = ((CFriendUser)(itr.next()));
+            if(tempUser.isAvailable_())
+                ClientDHApp1.getInstance().addUserToList(tempUser.getID_(), tempUser.getNickname_());
+        }
+        
+    }
     public CFriendUser getUser(int ID) {
         return cFriendUserMap.get(ID);
     }
