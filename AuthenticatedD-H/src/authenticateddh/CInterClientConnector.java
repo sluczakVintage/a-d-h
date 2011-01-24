@@ -5,12 +5,8 @@
 
 package authenticateddh;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.TreeMap;
 
 /**
  *
@@ -18,10 +14,11 @@ import java.util.logging.Logger;
  */
 public class CInterClientConnector {
 
+     private TreeMap<Integer, CInterClientCommunicationThread> threadMap = new TreeMap<Integer, CInterClientCommunicationThread>();
+     
      private static CInterClientConnector instance;
 
-     private boolean roleServer;
-     private Socket clientSocket;
+     private boolean listening;
 
      private CInterClientConnector()
     {
@@ -41,25 +38,25 @@ public class CInterClientConnector {
     throw new CloneNotSupportedException();
     }
 
-    public void setRoleServer(boolean roleServer) {
-        this.roleServer = roleServer;
-    }
-
-    public boolean getRoleServer() {
-        return roleServer;
-    }
-
-    synchronized public boolean prepareConnection(String hostname, int port) {
-        try {
-            clientSocket = new Socket(hostname, port);
-            System.out.println("Standard connection completed");
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(CInterClientConnector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(CInterClientConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    synchronized public boolean prepareConnection(int ID) {
+        CInterClientCommunicationThread tempThread = new CInterClientCommunicationThread(CFriendUserManager.getInstance().getUser(ID).getInetAddress().getHostAddress(), CClientConstraints.TCP_PORT + ID, ID);
+        tempThread.start();
+        threadMap.put(ID, tempThread);
+        threadMap.get(ID).startThread();
+        
 
         return true;
     }
+       
+
+    public void executeAction(int ID, CCommandType command, String message) {
+        threadMap.get(ID).setCommand(command);
+        threadMap.get(ID).setFriendID(ID);
+        threadMap.get(ID).setMessage(message);
+        threadMap.get(ID).setSend(true);
+    }
+
 
 }
+
+

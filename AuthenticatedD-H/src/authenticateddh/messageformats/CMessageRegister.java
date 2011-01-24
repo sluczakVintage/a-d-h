@@ -22,8 +22,6 @@ public class CMessageRegister extends CMessage {
     private BigInteger r_ID;
     private int s_ID;
     private CLoggedList loggedList;
-
-
     
 
     public CMessageRegister(String nickname, String passwordHash, int ID, BigInteger g, BigInteger y, BigInteger q, BigInteger r_ID, int s_ID) {

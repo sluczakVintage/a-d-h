@@ -6,69 +6,95 @@
 package authenticateddh;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.channels.ServerSocketChannel;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Sebastian
  */
-public class CInterClientConnectorServer {
+public class CInterClientConnectorServer extends Thread{
 
-     private static CInterClientConnectorServer instance;
 
-     private boolean roleServer;
-     private Socket clientSocket;
+    static private CInterClientConnectorServer instance;
 
-     private CInterClientConnectorServer()
+    private ServerSocketChannel serverChannel;
+    private int workingPort;
+    private boolean listening = false;
+    //mapa watkow
+    private TreeMap<Integer, CInterClientCommunicationServerThread> threadMap = new TreeMap<Integer, CInterClientCommunicationServerThread>();
+
+
+
+    private CInterClientConnectorServer() 
     {
-
-        System.out.println("CInterClientConnector");
+       System.out.println("CServerConnector");
     }
 
-    public static synchronized CInterClientConnectorServer getInstance() {
+    public static synchronized CInterClientConnectorServer getInstance()  {
 	if (instance == null) {
 		instance = new CInterClientConnectorServer();
 	}
 	return instance;
     }
 
-    /// @Override clone nadpisanie
+   /// @Override clone nadpisanie
     public Object clone() throws CloneNotSupportedException {
     throw new CloneNotSupportedException();
     }
 
-    public void setRoleServer(boolean roleServer) {
-        this.roleServer = roleServer;
-    }
+    public void run() {
 
-    public boolean getRoleServer() {
-        return roleServer;
-    }
-
-    synchronized public boolean prepareConnection(String hostname, int port) {
-
-        ServerSocket serverSocket = null;
         try {
-            serverSocket = new ServerSocket(port);
-        } catch (NullPointerException ex) {
-            System.err.println(ex.getMessage());
-        } catch (IOException e) {
-            System.err.println("Could not listen on port: " + port);
-            System.exit(1);
+        int i = 0;
+        serverChannel = ServerSocketChannel.open();
+        serverChannel.configureBlocking(true);
+
+        serverChannel.socket().bind(new InetSocketAddress(workingPort));
+
+        System.out.println("Listening on " + workingPort );
+        
+        while (listening) {
+            CInterClientCommunicationServerThread tempThread = new CInterClientCommunicationServerThread(serverChannel.accept(), i);
+            tempThread.start();
+            threadMap.put(i, tempThread);
+            threadMap.get(i);
+            i++;
+            sleep(1000);
         }
 
-        clientSocket = null;
-        try {
-            clientSocket = serverSocket.accept();
-            serverSocket.close();
-        } catch (IOException e) {
-            System.err.println("Accept failed.");
-            System.exit(1);
+        serverChannel.close();
         }
-        System.out.println("Connection as server completed");
-
-        return true;
+        catch (InterruptedException ex) {
+            Logger.getLogger(CInterClientConnectorServer.class.getName()).log(Level.SEVERE, null, ex);
+        }         catch ( IOException ex) {
+            System.err.println("IO Exception " + ex.getMessage());
+       }
     }
 
+    public void stopServerConnector() {
+        listening = false;
+    }
+
+    public void startServerConnector() {
+        this.workingPort = CClientConstraints.TCP_PORT + CClientConstraints.getInstance().getID();
+        listening = true;
+    }
+
+    public boolean getListeningState() {
+        return listening;
+    }
+
+    public void executeAction(int windowNo, CCommandType command, String message) {
+        threadMap.get(windowNo).setCommand(command);
+        threadMap.get(windowNo).setMessage(message);
+        threadMap.get(windowNo).setSend(true);
+    }
+
+    public void setFriendID(int windowNo, int friendID) {
+        threadMap.get(windowNo).setFriendID(friendID);
+    }
 }
