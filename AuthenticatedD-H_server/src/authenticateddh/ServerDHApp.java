@@ -133,25 +133,18 @@ public class ServerDHApp extends javax.swing.JFrame implements Runnable {
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jButtonStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStartActionPerformed
-        try {
             CServerConnector.getInstance().startServerConnector();
             new Thread(cServerConnector).start();
             KeyGenerationCenter.getInstance();
 
-        } catch (IOException ex) {
-            Logger.getLogger(ServerDHApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
         // TODO add your handling code here:
     }//GEN-LAST:event_jButtonStartActionPerformed
 
     private void jButtonStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStopActionPerformed
-        try {
             jTextAreaLog.append("Tu powinien dzialac stop\n"); // TODO add your handling code here:
             CServerConnector.getInstance().stopServerConnector();
-        } catch (IOException ex) {
-            Logger.getLogger(ServerDHApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
 
     }//GEN-LAST:event_jButtonStopActionPerformed
 
@@ -160,11 +153,10 @@ public class ServerDHApp extends javax.swing.JFrame implements Runnable {
     }
 
     public void run(){
-        try {
             initComponents();
             setVisible(true);
             cServerConnector = CServerConnector.getInstance();
-        }
+        
         /**
          * @param args the command line arguments
          */
@@ -175,9 +167,7 @@ public class ServerDHApp extends javax.swing.JFrame implements Runnable {
         //}
         // });
         //}
-        catch (IOException ex) {
-            Logger.getLogger(ServerDHApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
     }
     /**
     * @param args the command line arguments

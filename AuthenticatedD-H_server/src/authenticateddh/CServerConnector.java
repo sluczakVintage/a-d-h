@@ -22,13 +22,13 @@ public class CServerConnector implements Runnable{
     
     private boolean listening;
 
-    private CServerConnector() throws IOException
+    private CServerConnector()
     {
        listening = true;
         System.out.println("CServerConnector");
     }
 
-    public static synchronized CServerConnector getInstance() throws IOException {
+    public static synchronized CServerConnector getInstance() {
 	if (instance == null) {
 		instance = new CServerConnector();
 	}
