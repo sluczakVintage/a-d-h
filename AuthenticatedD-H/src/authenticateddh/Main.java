@@ -6,6 +6,8 @@
 package authenticateddh;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 
 
 /**
@@ -36,12 +38,23 @@ public class Main {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         System.out.println("KLIENT");
 
 
         new Main();
+
+        SecureRandom random = new SecureRandom();
+        BigInteger cipher = new BigInteger(128, random);
+        //BigInteger cipher = new BigInteger
+        String message = "Malina jest najmadrzejszy";
+        System.out.println(message);
+        String encrypted = CClientConstraints.encryptMessage(cipher, message);
+        System.out.println(encrypted);
+        String decrypted = CClientConstraints.decryptMessage(cipher, encrypted);
+        System.out.println(decrypted);
+
 //
 //        while(true)
 //        {
