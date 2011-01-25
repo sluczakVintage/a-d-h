@@ -23,6 +23,10 @@ public class CFriendUser {
     private boolean available_;
     private BigInteger connectionKey_;
 
+    public void setConnectionKey_(BigInteger connectionKey_) {
+        this.connectionKey_ = connectionKey_;
+    }
+
     private int tID_;
     private BigInteger my_uID_;
     boolean generatedKeys_;

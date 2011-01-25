@@ -37,7 +37,7 @@ public class CInterClientCommunicationThread extends Thread{
     //zmienne uzywane przy transmisji
     private boolean send;
     private String message;
-    private CCommandType command = CCommandType.CT_NONE;
+    private CCommandType command;
     
     private boolean communication = false;
     private Socket clientSocket;
@@ -58,12 +58,15 @@ public class CInterClientCommunicationThread extends Thread{
         this.send = send;
 
     }
-    public CInterClientCommunicationThread(String hostname, int port, int friendID) {
+    //command decyduje o pierwszej wiadomosci
+    public CInterClientCommunicationThread(String hostname, int port, int friendID,  CCommandType command) {
 	super("CInterClientCommunicationThread");
 
         this.hostname = hostname;
         this.port = port;
         this.friendID = friendID;
+        this.command = command;
+
         cInterClientCommunicationProtocol = new CInterClientCommunicationProtocol(friendID);
         System.out.println("Attempting connection to " + hostname + ":" + port);
 
@@ -156,63 +159,103 @@ public class CInterClientCommunicationThread extends Thread{
     {
         System.out.println("standardCommunication");
         clientSocket = sChannel.socket();
-
-        ObjectInputStream oInputStream = null;
-
-        //Wysylanie
-        ObjectOutputStream oOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+        boolean result = false;
 
         CPacket packetOut = new CPacket();
         CPacket packetIn = new CPacket();
 
-        boolean result = false;
+        ObjectInputStream oInputStream = null;
+        ObjectOutputStream oOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
 
-        try {
-            while(communication) {
-                if(!(command == CCommandType.CT_NONE)) {
+        //jesli jestesmy w fazie powitania
+        if(command == CCommandType.CT_HELLO) {
+
+
+            try {
+            //Wysylanie
+            packetOut = cInterClientCommunicationProtocol.processOutput(command, message, friendID);
+            oOutputStream.writeObject(packetOut);
+            oOutputStream.flush();
+            oOutputStream.reset();
+            //Odbieranie
+            if(oInputStream == null)
+                oInputStream = new ObjectInputStream(clientSocket.getInputStream());
+            packetIn = (CPacket) oInputStream.readObject();
+            cInterClientCommunicationProtocol.processInput(packetIn);
+            command = CCommandType.CT_NONE;
+            }  catch (ClassNotFoundException ex) {
+                Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SocketException ex) {
+                System.err.println(ex.getMessage());
+            } catch (NullPointerException ex) {
+                System.err.println(ex.getMessage());
+            }
+        }
+
+         while(communication) {
+            try {
+                if (command == CCommandType.CT_MESSAGE) {
                     packetOut = cInterClientCommunicationProtocol.processOutput(command, message, friendID);
-
                     oOutputStream.writeObject(packetOut);
                     oOutputStream.flush();
-
-                    //Odbieranie
-                    if(oInputStream == null)
-                        oInputStream = new ObjectInputStream(clientSocket.getInputStream());
-
-                    packetIn = (CPacket) oInputStream.readObject();
-
-                    cInterClientCommunicationProtocol.processInput(packetIn);
-                    command = CCommandType.CT_NONE;
-                    
                     oOutputStream.reset();
-
-                    while(command == CCommandType.CT_NONE ) {
-                         if(!communication) {
-                            return result;
-                        }
-                        sleep(100);
-                    }
-                }
-                if(!communication) {
-
-                        return result;
+                    command = CCommandType.CT_NONE;
                 }
                 sleep(1000);
-            }
-            //Zamykanie
-            oInputStream.close();
-            oOutputStream.close();
 
-        } catch (InterruptedException ex) {
-            Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SocketException ex) {
-            System.err.println(ex.getMessage());
-        } catch (NullPointerException ex) {
-            System.err.println(ex.getMessage());
-        }
-        System.out.println("komunikacja zakonczona");
+            } catch (InterruptedException ex) {
+                Logger.getLogger(CInterClientCommunicationThread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+      }
+    //Zamykanie
+    oInputStream.close();
+    oOutputStream.close();
+    System.out.println("komunikacja zakonczona");
+
+        ////KONIEC HELLO
+//            while(communication) {
+//                if(!(command == CCommandType.CT_NONE)) {
+//                    packetOut = cInterClientCommunicationProtocol.processOutput(command, message, friendID);
+//
+//                    oOutputStream.writeObject(packetOut);
+//                    oOutputStream.flush();
+//
+//                    //Odbieranie
+//                    if(oInputStream == null)
+//                        oInputStream = new ObjectInputStream(clientSocket.getInputStream());
+//
+//                    packetIn = (CPacket) oInputStream.readObject();
+//
+//                    cInterClientCommunicationProtocol.processInput(packetIn);
+//                    command = CCommandType.CT_NONE;
+//
+//                    oOutputStream.reset();
+//
+//                    while(command == CCommandType.CT_NONE ) {
+//                         if(!communication) {
+//                            return result;
+//                        }
+//                        sleep(100);
+//                    }
+//                }
+//                if(!communication) {
+//
+//                        return result;
+//                }
+//                sleep(1000);
+//            }
+//            //Zamykanie
+//            oInputStream.close();
+//            oOutputStream.close();
+//
+//        }  catch (ClassNotFoundException ex) {
+//            Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (SocketException ex) {
+//            System.err.println(ex.getMessage());
+//        } catch (NullPointerException ex) {
+//            System.err.println(ex.getMessage());
+//        }
+//        System.out.println("komunikacja zakonczona");
         return result;
     }
 

@@ -10,6 +10,8 @@ import authenticateddh.messageformats.CMessageComm;
 import authenticateddh.messageformats.CMessageHello;
 import authenticateddh.messageformats.CPacket;
 import java.math.BigInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -17,7 +19,6 @@ import java.math.BigInteger;
  */
 public class CInterClientCommunicationProtocol {
 
-    private BigInteger symKey = new BigInteger("0");
     private int threadNo;
   
     public CInterClientCommunicationProtocol(int threadNo)
@@ -64,21 +65,22 @@ public class CInterClientCommunicationProtocol {
             packet.setFlag(CCommandType.CT_ERROR);
         }
 
-        CCurrentCommand.getInstance().clearCurrentCommand();
         return packet;
     }
 
     /////////////////// KOMUNIKACJA KLIENT - KLIENT OUTPUT/////////////////////////
-
+    //tylko to istotne
     private CPacket prepareCMessageComm(CCommandType command, String message) {
         CPacket packet = new CPacket();
 
-        //@todo -> kodowanie wiadomosci
-        CMessageComm cMessageComm = new CMessageComm(message);
-
-        packet.setFlag(command);
-        packet.setCMessage(cMessageComm);
-
+        try {
+            message = CClientConstraints.encryptMessage(CFriendUserManager.getInstance().getUser(threadNo).getConnectionKey_(), message);
+            CMessageComm cMessageComm = new CMessageComm(message);
+            packet.setFlag(command);
+            packet.setCMessage(cMessageComm);
+        } catch (Exception ex) {
+            Logger.getLogger(CInterClientCommunicationProtocol.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return packet;
     }
 
@@ -102,7 +104,7 @@ public class CInterClientCommunicationProtocol {
     private void processCMessageComm(CMessage message) {
         
         String encryptedMessage = ((CMessageComm)message).getEncryptedMessage();
-
+        ClientDHApp1.getInstance().processIncomingMessage(threadNo, encryptedMessage);
         
     }
 
@@ -115,9 +117,9 @@ public class CInterClientCommunicationProtocol {
          CFriendUser cFriendUser = CFriendUserManager.getInstance().getUser(ID);
          cFriendUser.setConnectionParameters(r_ID, u_ID);
          //CInterClientConnector.getInstance().setFriendID(threadNo, ID);
-         symKey = CFriendUserManager.getInstance().computeConnectionKey(ID);
+         CFriendUserManager.getInstance().computeConnectionKey(ID);
 
-         //@todo stworz okno o indeksie i;
+         ClientDHApp1.getInstance().openMessageWindow(ID, cFriendUser.getNickname_());
     
     }
 

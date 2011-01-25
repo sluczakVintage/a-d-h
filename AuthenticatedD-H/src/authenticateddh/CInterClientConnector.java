@@ -38,18 +38,22 @@ public class CInterClientConnector {
     throw new CloneNotSupportedException();
     }
 
-    synchronized public boolean prepareConnection(int ID) {
-        CInterClientCommunicationThread tempThread = new CInterClientCommunicationThread(CFriendUserManager.getInstance().getUser(ID).getInetAddress().getHostAddress(), CClientConstraints.TCP_PORT + ID, ID);
+    synchronized public boolean prepareConnection(int ID, CCommandType command) {
+        CInterClientCommunicationThread tempThread = new CInterClientCommunicationThread(CFriendUserManager.getInstance().getUser(ID).getInetAddress().getHostAddress(), CClientConstraints.TCP_PORT + ID, ID, command);
         tempThread.start();
         threadMap.put(ID, tempThread);
         threadMap.get(ID).startThread();
-        CConnectionResolver.getInstance().setConnectionProperty(ID, false);
+        ////Temporarly removed
+        //CConnectionResolver.getInstance().setConnectionProperty(ID, false);
 
         return true;
     }
        
 
     public void executeAction(int ID, CCommandType command, String message) {
+        if(!threadMap.containsKey(ID)) {
+            prepareConnection(ID, command);
+        }
         threadMap.get(ID).setCommand(command);
         threadMap.get(ID).setFriendID(ID);
         threadMap.get(ID).setMessage(message);

@@ -91,7 +91,6 @@ public class CInterClientConnectorServer extends Thread{
     public void executeAction(int windowNo, CCommandType command, String message) {
         threadMap.get(windowNo).setCommand(command);
         threadMap.get(windowNo).setMessage(message);
-        threadMap.get(windowNo).setSend(true);
     }
 
     public void setFriendID(int oldFriendNo, int friendID) {
@@ -99,7 +98,8 @@ public class CInterClientConnectorServer extends Thread{
         CInterClientCommunicationServerThread thread = threadMap.get(oldFriendNo);
         threadMap.remove(oldFriendNo);
         thread.setFriendID(friendID);
-        CConnectionResolver.getInstance().setConnectionProperty(friendID, true);
+        ////Temporarly removed
+        //CConnectionResolver.getInstance().setConnectionProperty(friendID, true);
         threadMap.put(friendID,thread);
 
     }

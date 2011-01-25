@@ -114,6 +114,9 @@ public class CFriendUserManager {
         System.out.println("z2 to: " + z2);
         System.out.println("Klucz symetryczny to: " + result);
         //BigInteger result = new BigInteger("1234");
+        cFriendUser.setConnectionKey_(result);
+        cFriendUserMap.put(ID, cFriendUser);
+        
         return result;
     }
 }

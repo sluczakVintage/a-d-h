@@ -205,9 +205,8 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
             //addUserToList(wynik[0], wynik[1]);
             int ID = Integer.parseInt(wynik[0]);
 
-            CInterClientConnector.getInstance().prepareConnection( ID );
+            CInterClientConnector.getInstance().prepareConnection( ID, CCommandType.CT_HELLO);
             CInterClientConnector.getInstance().executeAction(ID, CCommandType.CT_HELLO, null);
-            openMessageWindow(ID, wynik[1]);
         }
                 //System.out.println(index);
 
@@ -290,7 +289,9 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     }
 
     public void processOutcomingMessage(int ID, String message){
-        CConnectionResolver.getInstance().resolveConnectionSendMessage(ID, CCommandType.CT_MESSAGE, message);
+        ////Temporarly removed
+        //CConnectionResolver.getInstance().resolveConnectionSendMessage(ID, CCommandType.CT_MESSAGE, message);
+        CInterClientConnector.getInstance().executeAction(ID, CCommandType.CT_MESSAGE, message);
 
     }
     synchronized public void addUserToList(int ID, String nick){
