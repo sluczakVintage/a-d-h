@@ -108,8 +108,8 @@ public class ConnectWindow extends javax.swing.JFrame {
         else{
             CClientConstraints.getInstance().setNickname(login);
             CClientConstraints.getInstance().setPasswordHash(pass);
-            CCurrentCommand.getInstance().setCurrentCommand(CCommandType.CT_REGISTER);
             CClientConnector.getInstance().startThread();
+            CCurrentCommand.getInstance().setCurrentCommand(CCommandType.CT_REGISTER);
             JOptionPane.showMessageDialog(null, "Udało się podłączyć do serwera", "Brawo", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         }

@@ -29,16 +29,16 @@ public class CInterClientCommunicationThread extends Thread{
     //dane do polaczenia
     private String hostname;
     private int port;
+    private int friendID = 0;
 
-    private int threadNo = 0;
 
-    private CInterClientCommunicationProtocol cInterClientCommunicationProtocol = new CInterClientCommunicationProtocol(threadNo);
+    private CInterClientCommunicationProtocol cInterClientCommunicationProtocol;
 
     //zmienne uzywane przy transmisji
     private boolean send;
     private String message;
     private CCommandType command = CCommandType.CT_NONE;
-    private int friendID = 0;
+    
     private boolean communication = false;
     private Socket clientSocket;
 
@@ -58,13 +58,13 @@ public class CInterClientCommunicationThread extends Thread{
         this.send = send;
 
     }
-    public CInterClientCommunicationThread(String hostname, int port, int threadNo) {
+    public CInterClientCommunicationThread(String hostname, int port, int friendID) {
 	super("CInterClientCommunicationThread");
 
         this.hostname = hostname;
         this.port = port;
-        this.threadNo = threadNo;
-
+        this.friendID = friendID;
+        cInterClientCommunicationProtocol = new CInterClientCommunicationProtocol(friendID);
         System.out.println("Attempting connection to " + hostname + ":" + port);
 
     }
@@ -80,6 +80,7 @@ public class CInterClientCommunicationThread extends Thread{
     }
 
     //polaczenie
+    @Override
     public void run()
 
     {
@@ -122,6 +123,8 @@ public class CInterClientCommunicationThread extends Thread{
                 Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        //CConnectionResolver.getInstance().removeConnectionProperty(friendID);
+        
     }
 
     //podlaczenie
@@ -166,7 +169,7 @@ public class CInterClientCommunicationThread extends Thread{
 
         try {
             while(communication) {
-                if(!(command.equals(CCommandType.CT_NONE))) {
+                if(!(command == CCommandType.CT_NONE)) {
                     packetOut = cInterClientCommunicationProtocol.processOutput(command, message, friendID);
 
                     oOutputStream.writeObject(packetOut);
@@ -179,10 +182,11 @@ public class CInterClientCommunicationThread extends Thread{
                     packetIn = (CPacket) oInputStream.readObject();
 
                     cInterClientCommunicationProtocol.processInput(packetIn);
-                    //result =
+                    command = CCommandType.CT_NONE;
+                    
                     oOutputStream.reset();
 
-                    while(command.equals(CCommandType.CT_NONE)) {
+                    while(command == CCommandType.CT_NONE ) {
                          if(!communication) {
                             return result;
                         }

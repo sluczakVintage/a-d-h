@@ -114,7 +114,7 @@ public class CInterClientCommunicationProtocol {
 
          CFriendUser cFriendUser = CFriendUserManager.getInstance().getUser(ID);
          cFriendUser.setConnectionParameters(r_ID, u_ID);
-         CInterClientConnectorServer.getInstance().setFriendID(threadNo, ID);
+         //CInterClientConnector.getInstance().setFriendID(threadNo, ID);
          symKey = CFriendUserManager.getInstance().computeConnectionKey(ID);
 
          //@todo stworz okno o indeksie i;

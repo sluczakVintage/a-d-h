@@ -42,10 +42,10 @@ public class CCommunicationProtocol {
 
     public boolean processInput(CPacket packet) {
 
-        System.out.println("Processing input ... FLAG = " + packet.getFlag());
+        //System.out.println("Processing input ... FLAG = " + packet.getFlag());
         CCommandType command = CCommandType.CT_ERROR;
 
-         System.out.println("Processing input... Flag = " + packet.getFlag());
+         
 
          if(packet.getFlag() == CCommandType.CT_REGISTER) {
              command = packet.getFlag();
@@ -71,7 +71,7 @@ public class CCommunicationProtocol {
         CPacket packet = new CPacket();
         CCommandType command = CCurrentCommand.getInstance().getCurrentCommand();
 
-        System.out.println("Processing output... Command = " + command.toString());
+        //System.out.println("Processing output... Command = " + command.toString());
 
         if(CCurrentCommand.getInstance().getCurrentCommand() == CCommandType.CT_REGISTER) {
             packet = prepareCMessageRegister(command);
@@ -139,6 +139,14 @@ public class CCommunicationProtocol {
         System.out.println("Udalo sie odebrać moje dane, ich długości w bitach to (oprócz S_ID): G " + CClientConstraints.getInstance().getG().bitLength() + " Y "  + CClientConstraints.getInstance().getY().bitLength() + " Q "  + CClientConstraints.getInstance().getQ().bitLength() + " S_ID "  + CClientConstraints.getInstance().getS_ID() + " R_ID "  + CClientConstraints.getInstance().getR_ID().bitLength());
         CFriendUserManager.getInstance().resetCFriendUserMap( ((CMessageRegister)cMessage).getUserList());
 
+        //serwer polaczen klienckich
+        CInterClientConnectorServer.getInstance().startServerConnector();
+        new Thread(CInterClientConnectorServer.getInstance()).start();
+
+        //autoaktualizacja listy
+        CListUpdater.getInstance().start();
+        CListUpdater.getInstance().setEnabled();
+
         //CInterClientConnectorServer.getInstance().startServerConnector();
     }
 
@@ -150,7 +158,6 @@ public class CCommunicationProtocol {
 
     private void processUserList(CMessage cMessage) {
         CFriendUserManager.getInstance().resetCFriendUserMap( ((CMessageUserList)cMessage).getUserList());
-        System.out.println("Moje nowe ID to: " + CClientConstraints.getInstance().getID());
     }
 
 

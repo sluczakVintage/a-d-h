@@ -53,7 +53,6 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
         jButtonDodaj = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
@@ -81,13 +80,6 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         jButtonDodaj.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonDodajActionPerformed(evt);
-            }
-        });
-
-        jButton1.setText("Serwer");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
             }
         });
 
@@ -153,19 +145,16 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel1)
-                            .addComponent(jButtonRozmowa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jButtonDodaj)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-                                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(6, 6, 6)))))
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6))))
+                    .addComponent(jButtonRozmowa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -178,10 +167,8 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButtonRozmowa)
-                    .addComponent(jButton1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                .addComponent(jButtonRozmowa)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton2))
         );
 
@@ -217,10 +204,8 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
             String[] wynik = znaleziony.split(" ");
             //addUserToList(wynik[0], wynik[1]);
             int ID = Integer.parseInt(wynik[0]);
-            
-            //@todo adres do łączenia powinien iść z CFriendUser
-            
-            CInterClientConnector.getInstance().prepareConnection(ID);
+
+            CInterClientConnector.getInstance().prepareConnection( ID );
             CInterClientConnector.getInstance().executeAction(ID, CCommandType.CT_HELLO, null);
             openMessageWindow(ID, wynik[1]);
         }
@@ -247,19 +232,12 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     System.exit(0);        
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    CInterClientConnectorServer.getInstance().startServerConnector();
-    new Thread(CInterClientConnectorServer.getInstance()).start();
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-//        int ID = 1;
-//        CInterClientConnector.getInstance().prepareConnection("localhost", ID);
-//        CInterClientConnector.getInstance().executeAction(ID, CCommandType.CT_HELLO, null);
+
 
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void openMessageWindow(int ID, String nick){
+    public void openMessageWindow(int ID, String nick){
         if(cMessageWindowsMap.containsKey(ID)){
             JOptionPane.showMessageDialog(null, "Już prowadzisz rozmowę z tym użytkownikiem", "Błąd", JOptionPane.ERROR_MESSAGE);
             //return null;
@@ -312,7 +290,8 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     }
 
     public void processOutcomingMessage(int ID, String message){
-        //tutaj niestety Fester musi cos skrobnac :)
+        CConnectionResolver.getInstance().resolveConnectionSendMessage(ID, CCommandType.CT_MESSAGE, message);
+
     }
     synchronized public void addUserToList(int ID, String nick){
         //listModel.insertElementAt(nick, ID);
@@ -333,7 +312,6 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
             }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButtonDodaj;
     private javax.swing.JButton jButtonRozmowa;

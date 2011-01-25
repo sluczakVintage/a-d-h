@@ -81,7 +81,7 @@ public class CFriendUserManager {
         return cFriendUserMap.get(ID);
     }
 
-    BigInteger computeConnectionKey(int ID){
+    synchronized BigInteger computeConnectionKey(int ID){
 
         CFriendUser cFriendUser = cFriendUserMap.get(ID);
         BigInteger rID = cFriendUser.getRID_();
@@ -89,12 +89,17 @@ public class CFriendUserManager {
         int my_tID =  cFriendUser.getTID_();
         int my_sID = CClientConstraints.getInstance().getS_ID();
         BigInteger y = CClientConstraints.getInstance().getY();
-        int h1 = CClientConstraints.H1(rID.add(BigInteger.valueOf(ID)));
-        BigInteger z1 = uID.multiply(rID.multiply(y)).pow(h1+my_tID+my_sID);
-        BigInteger z2 = uID.pow(my_tID);
-
-
-        BigInteger result = CClientConstraints.H2(z1.add(z2));
+//        System.out.println("Counting H1");
+//        int h1 = CClientConstraints.H1(rID.add(BigInteger.valueOf(ID)));
+//        System.out.println("Counting z1");
+//        BigInteger z1 = uID.multiply(rID.multiply(y)).pow(h1+my_tID+my_sID);
+//        System.out.println("Counting z2");
+//        BigInteger z2 = uID.pow(my_tID);
+//
+//        System.out.println("Counting H2");
+//        BigInteger result = CClientConstraints.H2(z1.add(z2));
+        
+        BigInteger result = new BigInteger("1234");
         return result;
     }
 }

@@ -49,7 +49,7 @@ public class CInterClientConnectorServer extends Thread{
     public void run() {
 
         try {
-        int i = 0;
+        int i = 1000;
         serverChannel = ServerSocketChannel.open();
         serverChannel.configureBlocking(true);
 
@@ -94,7 +94,13 @@ public class CInterClientConnectorServer extends Thread{
         threadMap.get(windowNo).setSend(true);
     }
 
-    public void setFriendID(int windowNo, int friendID) {
-        threadMap.get(windowNo).setFriendID(friendID);
+    public void setFriendID(int oldFriendNo, int friendID) {
+        //przydzielić odpowiedni numerek okna
+        CInterClientCommunicationServerThread thread = threadMap.get(oldFriendNo);
+        threadMap.remove(oldFriendNo);
+        thread.setFriendID(friendID);
+        CConnectionResolver.getInstance().setConnectionProperty(friendID, true);
+        threadMap.put(friendID,thread);
+
     }
 }

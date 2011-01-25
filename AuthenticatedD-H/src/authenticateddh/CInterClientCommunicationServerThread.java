@@ -26,9 +26,8 @@ public class CInterClientCommunicationServerThread extends Thread{
     private InetAddress sourceAddress;
     private ObjectInputStream oInputStream = null;
     private ObjectOutputStream oOutputStream = null;
-    private int threadNo = 0;
 
-    private CInterClientServerCommunicationProtocol cInterClientCommunicationProtocol = new CInterClientServerCommunicationProtocol(threadNo);
+    private CInterClientServerCommunicationProtocol cInterClientCommunicationProtocol;
 
     //zmienne uzywane przy transmisji
     private boolean send;
@@ -57,8 +56,10 @@ public class CInterClientCommunicationServerThread extends Thread{
 
 	this.socket = serverSocketChannel.socket();
         this.sourceAddress = socket.getInetAddress();
-        this.threadNo = threadNo;
+        this.friendID = threadNo;
 
+        cInterClientCommunicationProtocol = new CInterClientServerCommunicationProtocol(friendID);
+        
         System.out.println("Accepted connection from " + sourceAddress);
 
         try {
@@ -85,25 +86,47 @@ public class CInterClientCommunicationServerThread extends Thread{
 
         try {
 
+
+            packetIn = (CPacket) oInputStream.readObject();
+            command = cInterClientCommunicationProtocol.processInput(packetIn);
+            send = true;
+
+
             while(communication) {
-                //Odbieranie
-                if(!send) {
-                    packetIn = (CPacket) oInputStream.readObject();
-                    command = cInterClientCommunicationProtocol.processInput(packetIn);
-                    send = !send;
+                if(!(command == CCommandType.CT_NONE)) {
+                    //Odbieranie
+                    
+                    //Wysylanie
+                    if(send) {
+                        packetOut = cInterClientCommunicationProtocol.processOutput(command, message, friendID);
+                        command = CCommandType.CT_NONE;
+                        send = !send;
+                    }
+
+                    oOutputStream.writeObject(packetOut);
+                    oOutputStream.flush();
+                    oOutputStream.reset();
+
+                    if(!send) {
+                        packetIn = (CPacket) oInputStream.readObject();
+                        command = cInterClientCommunicationProtocol.processInput(packetIn);
+                        send = !send;
+                    }
+
+                    sleep(100);
+                    
+
+                    if(!CInterClientConnectorServer.getInstance().getListeningState())
+                        communication = false;
+
+                    while(command == CCommandType.CT_NONE) {
+                         if(!communication) {
+                            command.equals(CCommandType.CT_ERROR);
+                        }
+                        sleep(1000);
+                    }
                 }
-
-                //Wysylanie
-                if(send)
-                    packetOut = cInterClientCommunicationProtocol.processOutput(command, message, friendID);
-
-                oOutputStream.writeObject(packetOut);
-                oOutputStream.flush();
-                oOutputStream.reset();
-                sleep(100);
-
-                if(!CInterClientConnectorServer.getInstance().getListeningState())
-                    communication = false;
+                sleep(1000);
             }
             //Zamykanie
             oInputStream.close();
@@ -121,6 +144,7 @@ public class CInterClientCommunicationServerThread extends Thread{
             //disconnect client
         }
         System.out.println("Killing Thread");
+        CConnectionResolver.getInstance().removeConnectionProperty(friendID);
     }
 
 }

@@ -43,7 +43,7 @@ public class CInterClientConnector {
         tempThread.start();
         threadMap.put(ID, tempThread);
         threadMap.get(ID).startThread();
-        
+        CConnectionResolver.getInstance().setConnectionProperty(ID, false);
 
         return true;
     }

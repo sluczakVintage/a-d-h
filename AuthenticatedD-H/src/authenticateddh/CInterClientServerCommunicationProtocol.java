@@ -10,6 +10,9 @@ import authenticateddh.messageformats.CMessageComm;
 import authenticateddh.messageformats.CMessageHello;
 import authenticateddh.messageformats.CPacket;
 import java.math.BigInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import sun.text.normalizer.CharTrie.FriendAgent;
 
 /**
  *
@@ -29,7 +32,7 @@ public class CInterClientServerCommunicationProtocol {
 
     public CCommandType processInput(CPacket packet) {
 
-        System.out.println("Processing input ... FLAG = " + packet.getFlag());
+        System.out.println("Processing server input ... FLAG = " + packet.getFlag());
         CCommandType command = CCommandType.CT_ERROR;
 
          if(packet.getFlag() == CCommandType.CT_HELLO) {
@@ -52,7 +55,7 @@ public class CInterClientServerCommunicationProtocol {
 
         CPacket packet = new CPacket();
 
-        System.out.println("Processing output... Command = " + command.toString());
+        System.out.println("Processing server output... Command = " + command.toString());
 
         if(command == CCommandType.CT_HELLO) {
             packet = prepareCMessageHello(command, friendID);
@@ -102,24 +105,31 @@ public class CInterClientServerCommunicationProtocol {
 
     private void processCMessageComm(CMessage message) {
         
-        String encryptedMessage = ((CMessageComm)message).getEncryptedMessage();
+            String encryptedMessage = ((CMessageComm) message).getEncryptedMessage();
+        try {
+            encryptedMessage = CClientConstraints.decryptMessage(symKey, encryptedMessage);
+        } catch (Exception ex) {
+            Logger.getLogger(CInterClientServerCommunicationProtocol.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-        
+       ClientDHApp1.getInstance().processIncomingMessage(threadNo, encryptedMessage);
     }
 
-    private void processCMessageHello(CMessage message) {
+    synchronized private void processCMessageHello(CMessage message) {
 
         int ID = ((CMessageHello)message).getID();
         BigInteger r_ID = ((CMessageHello)message).getR();
         BigInteger u_ID = ((CMessageHello)message).getU();
 
-         CFriendUser cFriendUser = CFriendUserManager.getInstance().getUser(ID);
-         cFriendUser.setConnectionParameters(r_ID, u_ID);
-         CInterClientConnectorServer.getInstance().setFriendID(threadNo, ID);
-         symKey = CFriendUserManager.getInstance().computeConnectionKey(ID);
-    
-    }
 
+        CFriendUser cFriendUser = CFriendUserManager.getInstance().getUser(ID);
+        cFriendUser.setConnectionParameters(r_ID, u_ID);
+        
+        CInterClientConnectorServer.getInstance().setFriendID(threadNo, ID);
+        threadNo = ID;
+        symKey = CFriendUserManager.getInstance().computeConnectionKey(ID);
+        ClientDHApp1.getInstance().openMessageWindow(ID, cFriendUser.getNickname_());
+    }
 
 
 }
