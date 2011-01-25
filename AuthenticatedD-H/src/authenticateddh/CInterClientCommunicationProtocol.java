@@ -76,6 +76,7 @@ public class CInterClientCommunicationProtocol {
         try {
             message = CClientConstraints.encryptMessage(CFriendUserManager.getInstance().getUser(threadNo).getConnectionKey_(), message);
             CMessageComm cMessageComm = new CMessageComm(message);
+            cMessageComm.setID(CClientConstraints.getInstance().getID());
             packet.setFlag(command);
             packet.setCMessage(cMessageComm);
         } catch (Exception ex) {

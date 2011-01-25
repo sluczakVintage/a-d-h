@@ -58,7 +58,7 @@ public class CInterClientConnectorServer extends Thread{
         System.out.println("Listening on " + workingPort );
         
         while (listening) {
-            CInterClientCommunicationServerThread tempThread = new CInterClientCommunicationServerThread(serverChannel.accept(), i);
+            CInterClientCommunicationServerThread tempThread = new CInterClientCommunicationServerThread(serverChannel.accept(), i );
             tempThread.start();
             threadMap.put(i, tempThread);
             threadMap.get(i);

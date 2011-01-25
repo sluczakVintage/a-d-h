@@ -33,6 +33,7 @@ public class CInterClientCommunicationServerThread extends Thread{
     private String message;
     private CCommandType command;
     private int friendID = 0;
+    //opoznienie startu watku
 
     public void setCommand(CCommandType command) {
         this.command = command;
@@ -48,13 +49,12 @@ public class CInterClientCommunicationServerThread extends Thread{
     }
 
 
-    public CInterClientCommunicationServerThread(SocketChannel serverSocketChannel, int threadNo, CCommandType command ) {
+    public CInterClientCommunicationServerThread(SocketChannel serverSocketChannel, int threadNo ) {
 	super("CInterClientCommunicationThread");
 
 	this.socket = serverSocketChannel.socket();
         this.sourceAddress = socket.getInetAddress();
         this.friendID = threadNo;
-        this.command = command;
 
         cInterClientCommunicationProtocol = new CInterClientServerCommunicationProtocol(friendID);
         
@@ -85,10 +85,10 @@ public class CInterClientCommunicationServerThread extends Thread{
             oOutputStream = new ObjectOutputStream(socket.getOutputStream());
             //jesli po prostu sie witamy, to
             //powitanie!
-            if (command == CCommandType.CT_HELLO) {
+                packetIn = (CPacket) oInputStream.readObject();
+                command = cInterClientCommunicationProtocol.processInput(packetIn);
+                if (command == CCommandType.CT_HELLO) {
                 try {
-                    packetIn = (CPacket) oInputStream.readObject();
-                    command = cInterClientCommunicationProtocol.processInput(packetIn);
                     packetOut = cInterClientCommunicationProtocol.processOutput(command, message, friendID);
                     command = CCommandType.CT_MESSAGE;
                     oOutputStream.writeObject(packetOut);
@@ -96,9 +96,7 @@ public class CInterClientCommunicationServerThread extends Thread{
                     oOutputStream.reset();
                     ////Temporarly removed
                     //CConnectionResolver.getInstance().removeConnectionProperty(friendID);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(CInterClientCommunicationServerThread.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
+                }  catch (IOException ex) {
                     Logger.getLogger(CInterClientCommunicationServerThread.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } //gdy hello nie bylo nigdy wiadomoscia, to serwer tak czy siak zaczyna komunikacje
