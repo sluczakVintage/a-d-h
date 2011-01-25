@@ -66,7 +66,10 @@ public class CFriendUserManager {
             CUser tempUser = loggedList.get(i);
             int ID = tempUser.getID_();
             if(!cFriendUserMap.containsKey(ID)){
-            addUser(tempUser.getID_(), tempUser.getNickname_(), tempUser.getInetAddress(), tempUser.getAvailable());
+                addUser(ID, tempUser.getNickname_(), tempUser.getInetAddress(), tempUser.getAvailable());
+            }
+            else {
+                setFriendUserAvailable(ID, tempUser.getInetAddress(), tempUser.getAvailable());
             }
         }
 
