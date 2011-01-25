@@ -79,9 +79,9 @@ public class CUserManager {
             
                 tempUser = ((User)(itr.next()));
                 //przesyłaj tylko dostępnych
-                if((tempUser.getID() != ID) && tempUser.getAvailability()) {
-                CUser cUser = new CUser(tempUser.getID(), tempUser.getNickname(), tempUser.getInetAddress(), tempUser.getAvailability());
-                list.add(cUser);
+                if( (tempUser.getID() != ID) ) {
+                    CUser cUser = new CUser(tempUser.getID(), tempUser.getNickname(), tempUser.getInetAddress(), tempUser.getAvailability());
+                    list.add(cUser);
             }
         }
 
