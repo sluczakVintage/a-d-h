@@ -199,7 +199,7 @@ public class CClientConstraints {
             //System.out.println("liczba po wyjsciu z messageDigest to " + result + ", natomiast jej dlugosc to " + result.bitLength());
         } catch (NoSuchAlgorithmException ex) {
         }
-        while (result.bitLength() > 8) {
+        while (result.bitLength() > 4) {
             result = result.divide(TWO);
         }
         //System.out.println("liczba po wyjsciu z dzielenia w messageDigest to " + result + ", natomiast jej dlugosc to " + result.bitLength());
@@ -263,6 +263,7 @@ public class CClientConstraints {
         int IDs = ID;
         BigInteger rID = r_ID;
         BigInteger UID = cFriendUser.generateMyUID_();
+        System.out.println("Dla usera o id " + friendID + "wygenerowalem my_tID: " + cFriendUser.getTID_() + " oraz uID: " + UID);
 
     }
 

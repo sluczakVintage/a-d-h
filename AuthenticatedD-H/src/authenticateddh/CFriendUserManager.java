@@ -38,7 +38,7 @@ public class CFriendUserManager {
     public int addUser(int ID, String nickname, InetAddress inetAddress, boolean available) {
         //KeyPair userKeyPairs = KeyGenerationCenter.getInstance().generateKeys(ID);
         cFriendUserMap.put(ID, new CFriendUser(ID, nickname, inetAddress, available));
-
+        cFriendUserMap.get(ID).generateMyUID_();
         return ID;
     }
 
@@ -58,13 +58,16 @@ public class CFriendUserManager {
         }
 
     public void resetCFriendUserMap(CLoggedList loggedList) {
-        cFriendUserMap.clear();
+        //cFriendUserMap.clear();
         ClientDHApp1.getInstance().cleanupUserList();
         //System.out.println(loggedList.size());
 
         for(int i = 0; i < loggedList.size() ; i++) {
             CUser tempUser = loggedList.get(i);
+            int ID = tempUser.getID_();
+            if(!cFriendUserMap.containsKey(ID)){
             addUser(tempUser.getID_(), tempUser.getNickname_(), tempUser.getInetAddress(), tempUser.getAvailable());
+            }
         }
 
         Collection c = cFriendUserMap.values();
@@ -89,17 +92,28 @@ public class CFriendUserManager {
         int my_tID =  cFriendUser.getTID_();
         int my_sID = CClientConstraints.getInstance().getS_ID();
         BigInteger y = CClientConstraints.getInstance().getY();
-//        System.out.println("Counting H1");
-//        int h1 = CClientConstraints.H1(rID.add(BigInteger.valueOf(ID)));
-//        System.out.println("Counting z1");
-//        BigInteger z1 = uID.multiply(rID.multiply(y)).pow(h1+my_tID+my_sID);
-//        System.out.println("Counting z2");
-//        BigInteger z2 = uID.pow(my_tID);
-//
-//        System.out.println("Counting H2");
-//        BigInteger result = CClientConstraints.H2(z1.add(z2));
-        
-        BigInteger result = new BigInteger("1234");
+        //System.out.println("Counting H1");
+        int h1 = CClientConstraints.H1(rID.add(BigInteger.valueOf(ID)));
+        //System.out.println("Counting a: uID*rID");
+        //BigInteger z1 = uID.multiply(rID.multiply(y)).pow(h1+my_tID+my_sID);
+        BigInteger temp1 = uID.multiply(rID);
+        //System.out.println("Counting b: y^h1");
+        BigInteger temp2 = y.pow(h1);
+        //System.out.println("Counting c: a*b");
+        BigInteger temp3 = temp1.multiply(temp2);
+        //System.out.println("Counting z1");
+        BigInteger z1 = temp3.pow(my_tID+my_sID);
+
+       //System.out.println("Counting z2");
+        BigInteger z2 = uID.pow(my_tID);
+
+        //System.out.println("Counting H2");
+        BigInteger result = CClientConstraints.H2(z1.add(z2));
+        //System.out.println("done");
+        System.out.println("z1 to: " + z1);
+        System.out.println("z2 to: " + z2);
+        System.out.println("Klucz symetryczny to: " + result);
+        //BigInteger result = new BigInteger("1234");
         return result;
     }
 }

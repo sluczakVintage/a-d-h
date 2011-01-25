@@ -25,6 +25,7 @@ public class CFriendUser {
 
     private int tID_;
     private BigInteger my_uID_;
+    boolean generatedKeys_;
 
     CFriendUser(){}
 
@@ -33,12 +34,17 @@ public class CFriendUser {
         this.ID_ = ID_;
         this.inetAddress = inetAddress;
         this.available_ = available_;
+        generatedKeys_=false;
     }
 
 
     public BigInteger generateMyUID_(){
-        tID_ = CClientConstraints.getInstance().getRandomNumber(8);
+        if(!generatedKeys_){
+        tID_ = CClientConstraints.getInstance().getRandomNumber(4);
         my_uID_= CClientConstraints.getInstance().getG().pow(tID_);
+        System.out.println("Jestem " + CClientConstraints.getInstance().getNickname() +  "Dla usera o nickname " + nickname_ + "wygenerowalem my_tID: " + tID_ + " oraz uID: " + my_uID_);
+        generatedKeys_=true;
+        }
         return my_uID_;
     }
 

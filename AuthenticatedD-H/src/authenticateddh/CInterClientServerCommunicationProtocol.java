@@ -12,7 +12,6 @@ import authenticateddh.messageformats.CPacket;
 import java.math.BigInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sun.text.normalizer.CharTrie.FriendAgent;
 
 /**
  *
@@ -93,7 +92,7 @@ public class CInterClientServerCommunicationProtocol {
 
         CMessageHello cMessageHello = new CMessageHello(CClientConstraints.getInstance().getID(),
                                                         CClientConstraints.getInstance().getR_ID(),
-                                                        cFriendUser.generateMyUID_());
+                                                        cFriendUser.getMy_uID_());
 
         packet.setFlag(command);
         packet.setCMessage(cMessageHello);
