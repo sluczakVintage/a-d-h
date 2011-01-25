@@ -50,7 +50,7 @@ public class KeyGenerationCenter {
             return false;
         }
         generator_ = fact.getG();
-        x_=getRandomNumber(8);
+        x_=getRandomNumber(2);
         y_=generator_.pow(x_);
         //System.out.println("grupa to " + primeOrder_ + ",jej dlugosc to " + primeOrder_.bitLength() + ", natomiast generator to " + generator_ + ",a jej dlugosc to " + generator_.bitLength());
         System.out.println("KGC poprawnie zainicjowane");
@@ -59,7 +59,7 @@ public class KeyGenerationCenter {
     }
 
     public synchronized KeyPair generateKeys(int id){
-        int k=getRandomNumber(8);
+        int k=getRandomNumber(4);
         BigInteger rID=generator_.pow(k);;
         int sID= k + H1(rID.add(BigInteger.valueOf(id)))*x_;
         //H1(rID.add(BigInteger.valueOf(id))
@@ -94,7 +94,7 @@ public class KeyGenerationCenter {
             //Logger.getLogger(KeyGenerationCenter.class.getName()).log(Level.SEVERE, null, ex);
         }
         //result.bitLength();
-        while(result.bitLength()>8){
+        while(result.bitLength()>4){
             result =result.divide(TWO);
         }
         //System.out.println("liczba po wyjsciu z dzielenia w messageDigest to " + result + ", natomiast jej dlugosc to " + result.bitLength());
