@@ -41,16 +41,21 @@ public class CListUpdater extends Thread{
 
 
         while(true) {
-            while(enabled) {
-                try {
-                    CCurrentCommand.getInstance().setCurrentCommand(CCommandType.CT_LIST);
-                    while (!enabled) {
+            try {
+                while (enabled) {
+                    try {
+                        CCurrentCommand.getInstance().setCurrentCommand(CCommandType.CT_LIST);
+                        while (!enabled) {
+                            sleep(10000);
+                        }
                         sleep(10000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(CListUpdater.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    sleep(10000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(CListUpdater.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                sleep(10000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(CListUpdater.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
