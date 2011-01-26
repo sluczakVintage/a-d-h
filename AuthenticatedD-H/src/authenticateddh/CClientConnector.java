@@ -73,7 +73,7 @@ public class CClientConnector extends Thread {
                     System.out.println("Connection started");
                     if(standardConnect(CClientConstraints.SERVER_IP, CClientConstraints.SERVER_TCP_PORT)) {
                         System.out.println("Standard connection completed");
-                        ClientDHApp1.getInstance().toggleButtons();
+                        ClientDHApp1.getInstance().toggleButtons(true);
 
                         standardCommunication();
                     }
@@ -121,7 +121,7 @@ public class CClientConnector extends Thread {
         try {
             sChannel.close();
             System.out.println("Disconnected");
-            ClientDHApp1.getInstance().toggleButtons();
+            ClientDHApp1.getInstance().toggleButtons(false);
             CListUpdater.getInstance().setDisabled();
         } catch (IOException ex) {
             Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);

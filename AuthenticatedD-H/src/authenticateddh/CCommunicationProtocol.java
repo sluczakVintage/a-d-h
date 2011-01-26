@@ -136,18 +136,22 @@ public class CCommunicationProtocol {
                 ((CMessageRegister)cMessage).getQ(),
                 ((CMessageRegister)cMessage).getR_ID(),
                 ((CMessageRegister)cMessage).getS_ID());
-        System.out.println("Udalo sie odebrać moje dane, ich długości w bitach to (oprócz S_ID): G " + CClientConstraints.getInstance().getG().bitLength() + " Y "  + CClientConstraints.getInstance().getY().bitLength() + " Q "  + CClientConstraints.getInstance().getQ().bitLength() + " S_ID "  + CClientConstraints.getInstance().getS_ID() + " R_ID "  + CClientConstraints.getInstance().getR_ID().bitLength());
-        CFriendUserManager.getInstance().resetCFriendUserMap( ((CMessageRegister)cMessage).getUserList());
+        if( ((CMessageRegister)cMessage).getID() != 0 ) {
+            System.out.println("Udalo sie odebrać moje dane, ich długości w bitach to (oprócz S_ID): G " + CClientConstraints.getInstance().getG().bitLength() + " Y "  + CClientConstraints.getInstance().getY().bitLength() + " Q "  + CClientConstraints.getInstance().getQ().bitLength() + " S_ID "  + CClientConstraints.getInstance().getS_ID() + " R_ID "  + CClientConstraints.getInstance().getR_ID().bitLength());
+            CFriendUserManager.getInstance().resetCFriendUserMap( ((CMessageRegister)cMessage).getUserList());
+            //serwer polaczen klienckich
+            CInterClientConnectorServer.getInstance().startServerConnector();
+            new Thread(CInterClientConnectorServer.getInstance()).start();
 
-        //serwer polaczen klienckich
-        CInterClientConnectorServer.getInstance().startServerConnector();
-        new Thread(CInterClientConnectorServer.getInstance()).start();
-
-        //autoaktualizacja listy
-        CListUpdater.getInstance().start();
-        CListUpdater.getInstance().setEnabled();
-
-        //CInterClientConnectorServer.getInstance().startServerConnector();
+            //autoaktualizacja listy
+            CListUpdater.getInstance().setEnabled();
+            ConnectWindow.getInstance().showConnectionCompleted();
+            //CInterClientConnectorServer.getInstance().startServerConnector();
+        }
+        else {
+            System.out.println("Blad logowania!");
+            ConnectWindow.getInstance().showConnectionFailed();
+        }
     }
 
     private void processLoginData(CMessage cMessage) {

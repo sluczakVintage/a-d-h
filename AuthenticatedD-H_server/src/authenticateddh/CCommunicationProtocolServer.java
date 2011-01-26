@@ -11,6 +11,7 @@ import authenticateddh.messageformats.CMessageLogin;
 import authenticateddh.messageformats.CMessageRegister;
 import authenticateddh.messageformats.CMessageUserList;
 import authenticateddh.messageformats.CPacket;
+import java.math.BigInteger;
 import java.net.Socket;
 
 /**
@@ -83,11 +84,17 @@ public class CCommunicationProtocolServer {
     //prepare register data out
     private CPacket prepareCMessageRegister(CCommand command) {
         CPacket packet = new CPacket();
-
+        CMessageRegister cMessageRegister;
         User user = CUserManager.getInstance().getUser(command.getID());
         
-        CMessageRegister cMessageRegister = new CMessageRegister(user.getNickname(), null, user.getID(), user.getG(), user.getY(), KeyGenerationCenter.getInstance().getQ(), user.getR_ID(), user.getS_ID());
-        cMessageRegister.setUserList(CUserManager.getInstance().getLoggedList(command.getID()));
+        if(user != null) {
+            cMessageRegister = new CMessageRegister(user.getNickname(), null, user.getID(), user.getG(), user.getY(), KeyGenerationCenter.getInstance().getQ(), user.getR_ID(), user.getS_ID());
+            cMessageRegister.setUserList(CUserManager.getInstance().getLoggedList(command.getID()));
+        }
+        else {
+            cMessageRegister = new CMessageRegister("", null, 0, BigInteger.ONE, BigInteger.ONE, BigInteger.ONE, BigInteger.ONE, 0);
+            cMessageRegister.setUserList(CUserManager.getInstance().getLoggedList(command.getID()));
+        }
         packet.setFlag(command.getCommand());
         packet.setCMessage(cMessageRegister);
 

@@ -178,7 +178,7 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     private void jMenuItemConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemConnectActionPerformed
 
 
-        ConnectWindow connectWindow = new ConnectWindow();
+        ConnectWindow connectWindow = ConnectWindow.getInstance();
         connectWindow.setVisible(true);
        //CCurrentCommand.getInstance().setCurrentCommand(CCommandType.CT_REGISTER);
        //CClientConnector.getInstance().startThread();
@@ -222,8 +222,9 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     }//GEN-LAST:event_jMenuItemUserListActionPerformed
 
     private void jMenuItemDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDisconnectActionPerformed
-
+        CListUpdater.getInstance().setDisabled();
        CClientConnector.getInstance().stopThread();
+       CInterClientConnectorServer.getInstance().killThread();
        cleanupUserList();
     }//GEN-LAST:event_jMenuItemDisconnectActionPerformed
 
@@ -266,11 +267,11 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         listModel.clear();
     }
 
-    synchronized public void toggleButtons() {
-       boolean lastState = jMenuItemConnect.isEnabled();
-            jMenuItemDisconnect.setEnabled(lastState);
-            jMenuItemUserList.setEnabled(lastState);
-            jMenuItemConnect.setEnabled(!lastState);
+    synchronized public void toggleButtons(boolean isConnected) {
+       
+            jMenuItemDisconnect.setEnabled(isConnected);
+            jMenuItemUserList.setEnabled(isConnected);
+            jMenuItemConnect.setEnabled(!isConnected);
 
     }
 
@@ -310,6 +311,8 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
                 jList1.setModel(listModel);
                 setVisible(true);
                 CClientConnector.getInstance().start();
+                CListUpdater.getInstance().start();
+
             }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

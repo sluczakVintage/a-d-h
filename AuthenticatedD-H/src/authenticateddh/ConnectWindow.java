@@ -19,11 +19,28 @@ import javax.swing.JOptionPane;
  */
 public class ConnectWindow extends javax.swing.JFrame {
 
+    private static ConnectWindow instance;
+
     /** Creates new form ConnectWindow */
-    public ConnectWindow() {
+
+    private ConnectWindow()
+    {
         initComponents();
         setTitle("Rejestracja");
+        System.out.println("ConnectWindow");
     }
+
+    /**
+     *
+     * @return
+     */
+    public static synchronized ConnectWindow getInstance() {
+	if (instance == null) {
+		instance = new ConnectWindow();
+	}
+	return instance;
+    }
+    
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -110,8 +127,6 @@ public class ConnectWindow extends javax.swing.JFrame {
             CClientConstraints.getInstance().setPasswordHash(pass);
             CClientConnector.getInstance().startThread();
             CCurrentCommand.getInstance().setCurrentCommand(CCommandType.CT_REGISTER);
-            JOptionPane.showMessageDialog(null, "Udało się podłączyć do serwera", "Brawo", JOptionPane.INFORMATION_MESSAGE);
-            dispose();
         }
        // if(loginTextField// TODO add your handling code here:
     }//GEN-LAST:event_jButtonConnectActionPerformed
@@ -121,6 +136,16 @@ public class ConnectWindow extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
+    public void showConnectionCompleted() {
+            JOptionPane.showMessageDialog(null, "Udało się podłączyć do serwera", "Brawo", JOptionPane.INFORMATION_MESSAGE);
+            ClientDHApp1.getInstance().toggleButtons(true);
+            dispose();
+    }
+
+    public void showConnectionFailed() {
+            ClientDHApp1.getInstance().toggleButtons(false);
+            JOptionPane.showMessageDialog(null, "Błędne dane logowania, lub nielegalna próba ponownego zalogowania", "Błąd", JOptionPane.ERROR_MESSAGE);
+    }
     /**
     * @param args the command line arguments
     */

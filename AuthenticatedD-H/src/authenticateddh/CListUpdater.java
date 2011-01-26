@@ -20,6 +20,7 @@ public class CListUpdater extends Thread{
     private CListUpdater()
     {
         System.out.println("CListUpdater");
+        enabled = false;
     }
 
     public static synchronized CListUpdater getInstance() {

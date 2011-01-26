@@ -16,6 +16,10 @@ import java.security.SecureRandom;
  */
 public class User {
 
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
     private static final BigInteger TWO = new BigInteger(String.valueOf(2));
     private static final BigInteger ZERO = new BigInteger(String.valueOf(0));
     private static final BigInteger ONE = new BigInteger(String.valueOf(1));

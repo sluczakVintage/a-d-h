@@ -33,7 +33,8 @@ public class CInterClientCommunicationServerThread extends Thread{
     private String message;
     private CCommandType command;
     private int friendID = 0;
-    //opoznienie startu watku
+
+    private boolean communication = true;
 
     public void setCommand(CCommandType command) {
         this.command = command;
@@ -78,7 +79,6 @@ public class CInterClientCommunicationServerThread extends Thread{
         CPacket packetOut = new CPacket();
         CPacket packetIn = new CPacket();
         System.out.println("ruszylem!");
-        boolean communication = true;
 
        try {
             oInputStream = new ObjectInputStream(socket.getInputStream());
@@ -103,20 +103,8 @@ public class CInterClientCommunicationServerThread extends Thread{
             //Dopoki trwa komunikacja
             while (communication) {
                 if (command == CCommandType.CT_MESSAGE) {
-                    // jesli watek jest wysylajacym
-//                    if (isSender) {
-//                        //jestli chodzi o transmisje wiadomosci
-//                        packetOut = cInterClientCommunicationProtocol.processOutput(command, message, friendID);
-//                        oOutputStream.writeObject(packetOut);
-//                        oOutputStream.flush();
-//                        oOutputStream.reset();
-//                        command = CCommandType.CT_NONE;
-//                    } else
-                       // if (!isSender) {
                         packetIn = (CPacket) oInputStream.readObject();
                         cInterClientCommunicationProtocol.processInput(packetIn);
-                        //command = CCommandType.CT_NONE;
-                   // }
                 }
                 sleep(1000);
             }
@@ -141,67 +129,10 @@ public class CInterClientCommunicationServerThread extends Thread{
             }
         }
     }
+
+    public void setCommunication(boolean communication) {
+        this.communication = communication;
+    }
 }
-
-
-        ////KONIEC HELLO
-
-//            while(communication) {
-//                if(!(command == CCommandType.CT_NONE)) {
-//                    //Odbieranie
-//
-//                    //Wysylanie
-//                    if(send) {
-//                        packetOut = cInterClientCommunicationProtocol.processOutput(command, message, friendID);
-//                        command = CCommandType.CT_NONE;
-//                        send = !send;
-//                    }
-//
-//                    oOutputStream.writeObject(packetOut);
-//                    oOutputStream.flush();
-//                    oOutputStream.reset();
-//
-//                    if(!send) {
-//                        packetIn = (CPacket) oInputStream.readObject();
-//                        command = cInterClientCommunicationProtocol.processInput(packetIn);
-//                        send = !send;
-//                    }
-//
-//                    sleep(100);
-//
-//
-//                    if(!CInterClientConnectorServer.getInstance().getListeningState())
-//                        communication = false;
-//
-//                    while(command == CCommandType.CT_NONE) {
-//                         if(!communication) {
-//                            command.equals(CCommandType.CT_ERROR);
-//                        }
-//                        sleep(1000);
-//                    }
-//                }
-//                sleep(1000);
-//            }
-//            //Zamykanie
-//            oInputStream.close();
-//            oOutputStream.close();
-//
-//            socket.close();
-
-//
-//        } catch (ClassNotFoundException ex) {
-//            Logger.getLogger(CInterClientCommunicationServerThread.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (IOException ex) {
-//            Logger.getLogger(CInterClientCommunicationServerThread.class.getName()).log(Level.SEVERE, null, ex);
-//            //disconnect client
-//        }
-//            //Zamykanie
-//            oInputStream.close();
-//            oOutputStream.close();
-//
-//            socket.close();
-//        System.out.println("Killing Thread");
-//        CConnectionResolver.getInstance().removeConnectionProperty(friendID);
-
 
 

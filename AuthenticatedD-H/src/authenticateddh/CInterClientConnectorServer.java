@@ -8,6 +8,8 @@ package authenticateddh;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,7 +63,6 @@ public class CInterClientConnectorServer extends Thread{
             CInterClientCommunicationServerThread tempThread = new CInterClientCommunicationServerThread(serverChannel.accept(), i );
             tempThread.start();
             threadMap.put(i, tempThread);
-            threadMap.get(i);
             i++;
             sleep(1000);
         }
@@ -91,6 +92,17 @@ public class CInterClientConnectorServer extends Thread{
     public void executeAction(int windowNo, CCommandType command, String message) {
         threadMap.get(windowNo).setCommand(command);
         threadMap.get(windowNo).setMessage(message);
+    }
+
+    public void killThread() {
+        Collection c = threadMap.values();
+        Iterator itr = c.iterator();
+
+        while(itr.hasNext()) {
+            CInterClientCommunicationServerThread tempThread = ((CInterClientCommunicationServerThread)(itr.next()));
+            tempThread.setCommunication(false);
+            System.out.println("Stopping thread");
+        }
     }
 
     public void setFriendID(int oldFriendNo, int friendID) {

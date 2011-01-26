@@ -148,7 +148,7 @@ public class CInterClientCommunicationThread extends Thread{
         try {
             sChannel.close();
             System.out.println("Disconnected");
-            ClientDHApp1.getInstance().toggleButtons();
+            ClientDHApp1.getInstance().toggleButtons(false);
         } catch (IOException ex) {
             Logger.getLogger(CClientConnector.class.getName()).log(Level.SEVERE, null, ex);
         }

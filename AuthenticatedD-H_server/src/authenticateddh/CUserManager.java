@@ -9,6 +9,7 @@ import authenticateddh.messageformats.CUser;
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -38,11 +39,35 @@ public class CUserManager {
     }
 
     synchronized public int addUser(String nickname, String passwordHash, InetAddress address) {
-        ID++;
-        KeyPair userKeyPairs = KeyGenerationCenter.getInstance().generateKeys(ID);
-        cUserMap.put(ID, new User(ID, nickname, passwordHash, KeyGenerationCenter.getInstance().getGenerator_(), KeyGenerationCenter.getInstance().getY_(),userKeyPairs.getsID_(), userKeyPairs.getrID_(),  address, true));
+         KeyPair userKeyPairs;
+        //przejrzyj mape uzytkownikow w poszukiwaniu tego konkretnego
+        for (Iterator it = cUserMap.entrySet().iterator(); it.hasNext();) {
+           Map.Entry entry = (Map.Entry) it.next();
+           int key = (Integer)(entry.getKey());
+           User value = (User)(entry.getValue());
+
+           User tempUser = value;
+            
+            if(  (tempUser.getNickname()).equals(nickname)  ) {
+                //jesli ustnieje taki nickname i zgadza sie haslo i user nie jest teraz dostepny
+                if( (tempUser.getPasswordHash()).equals(passwordHash) && !tempUser.getAvailability() ) {
+                    userKeyPairs = KeyGenerationCenter.getInstance().generateKeys(key);
+                    cUserMap.put( key, new User(ID, nickname, passwordHash, KeyGenerationCenter.getInstance().getGenerator_(), KeyGenerationCenter.getInstance().getY_(),userKeyPairs.getsID_(), userKeyPairs.getrID_(),  address, true));
+                    return key;
+                }
+                //jesli istnieje nickname, ale haslo sie nie zgadza
+                else  {
+                    return 0;
+                }
+            }
+        }
+           //jesli nie istnieje, stworz nowego
         
+        ID++;
+        userKeyPairs = KeyGenerationCenter.getInstance().generateKeys(ID);
+        cUserMap.put(ID, new User(ID, nickname, passwordHash, KeyGenerationCenter.getInstance().getGenerator_(), KeyGenerationCenter.getInstance().getY_(),userKeyPairs.getsID_(), userKeyPairs.getrID_(),  address, true));
         return ID;
+        
     }
 
     synchronized public int setUserAvailable(int ID, String nickname, String passwordHash, InetAddress address, boolean available) {
