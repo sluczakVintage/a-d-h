@@ -52,8 +52,9 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         jButtonRozmowa = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
-        jButtonDodaj = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        userLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItemConnect = new javax.swing.JMenuItem();
@@ -64,7 +65,7 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("Zalogowani użytkownicy:");
+        jLabel1.setText("Lista znajomych:");
 
         jButtonRozmowa.setText("Rozpocznij rozmowę");
         jButtonRozmowa.addActionListener(new java.awt.event.ActionListener() {
@@ -76,19 +77,16 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(jList1);
 
-        jButtonDodaj.setText("Dodaj Usera");
-        jButtonDodaj.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonDodajActionPerformed(evt);
-            }
-        });
-
         jButton2.setText("Client");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
+
+        jLabel2.setText("Użytkownik: ");
+
+        userLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
 
         jMenu1.setText("File");
 
@@ -144,27 +142,29 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+                    .addComponent(jLabel1)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(6, 6, 6))
+                    .addComponent(jButtonRozmowa, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButtonDodaj)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(6, 6, 6))))
-                    .addComponent(jButtonRozmowa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(userLabel)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jButtonDodaj))
-                .addGap(18, 18, 18)
+                    .addComponent(jLabel2)
+                    .addComponent(userLabel))
+                .addGap(15, 15, 15)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonRozmowa)
@@ -211,11 +211,6 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
                 //System.out.println(index);
 
     }//GEN-LAST:event_jButtonRozmowaActionPerformed
-
-    private void jButtonDodajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDodajActionPerformed
-        // TODO add your handling code here:
-        addUserToList(5, "Rafał");
-    }//GEN-LAST:event_jButtonDodajActionPerformed
 
     private void jMenuItemUserListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemUserListActionPerformed
         CCurrentCommand.getInstance().setCurrentCommand(CCommandType.CT_LIST);
@@ -289,6 +284,9 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
         }
     }
 
+    public void setUserText(String nick){
+        userLabel.setText(nick);
+    }
     public void processOutcomingMessage(int ID, String message){
         ////Temporarly removed
         //CConnectionResolver.getInstance().resolveConnectionSendMessage(ID, CCommandType.CT_MESSAGE, message);
@@ -317,9 +315,9 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButtonDodaj;
     private javax.swing.JButton jButtonRozmowa;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
@@ -329,6 +327,7 @@ public class ClientDHApp1 extends javax.swing.JFrame implements Runnable{
     private javax.swing.JMenuItem jMenuItemUserList;
     private javax.swing.JMenuItem jMenuItemVerify;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel userLabel;
     // End of variables declaration//GEN-END:variables
 
 }

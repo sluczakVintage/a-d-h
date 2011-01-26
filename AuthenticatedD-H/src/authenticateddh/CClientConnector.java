@@ -71,7 +71,7 @@ public class CClientConnector extends Thread {
                     sChannel.configureBlocking(true);
 
                     System.out.println("Connection started");
-                    if(standardConnect(CClientConstraints.SERVER_IP, CClientConstraints.SERVER_TCP_PORT)) {
+                    if(standardConnect(CClientConstraints.getInstance().getSERVER_IP(), CClientConstraints.SERVER_TCP_PORT)) {
                         System.out.println("Standard connection completed");
                         ClientDHApp1.getInstance().toggleButtons(true);
 

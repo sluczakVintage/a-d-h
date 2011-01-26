@@ -35,7 +35,17 @@ public class CClientConstraints {
     /**
      *
      */
-    public static final String SERVER_IP = "localhost";
+    public String SERVER_IP = "localhost";
+
+    public String getSERVER_IP() {
+        return SERVER_IP;
+    }
+
+    public void setSERVER_IP(String SERVER_IP) {
+        this.SERVER_IP = SERVER_IP;
+    }
+
+
     private static final BigInteger TWO = new BigInteger(String.valueOf(2));
     private static final BigInteger ZERO = new BigInteger(String.valueOf(0));
     private static final BigInteger ONE = new BigInteger(String.valueOf(1));
